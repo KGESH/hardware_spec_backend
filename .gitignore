@@ -40,3 +40,6 @@ lerna-debug.log*
 
 # local redis data
 redis-data
+
+# local db data
+local
