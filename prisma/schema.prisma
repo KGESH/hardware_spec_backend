@@ -9,3 +9,23 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model estimate {
+  id         String    @id @db.Uuid
+  name       String?
+  cpu_id     String?   @db.Uuid
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  cpu        cpu?      @relation(fields: [cpu_id], references: [id])
+}
+
+model cpu {
+  id         String     @id @db.Uuid
+  name       String
+  price      Float
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  deleted_at DateTime?
+  estimate   estimate[]
+}

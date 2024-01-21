@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "ts-patch install && typia patch",
-    "migrate:local": "pnpm dlx prisma migrate dev"
+    "migrate:local": "dotenv -e .env.dev -- pnpm dlx prisma migrate dev"
   },
   "dependencies": {
     "@nestia/core": "^2.4.5",
