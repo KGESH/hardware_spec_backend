@@ -1,14 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { redisFactory } from '../../src/modules/redis.module';
-import { IRedisRepository } from '../../src/interfaces/redis.repository.interface';
+import { redisFactory } from '../../../src/modules/redis.module';
+import { IRedisRepository } from '../../../src/interfaces/redis.repository.interface';
 import { v4 as uuidV4 } from 'uuid';
-import { REDIS_FACTORY } from '../../src/constants/redis.constant';
-import { RedisRepository } from '../../src/repositories/redis.repository';
+import { REDIS_FACTORY } from '../../../src/constants/redis.constant';
+import { RedisRepository } from '../../../src/repositories/redis.repository';
 import { Redis } from 'ioredis';
+import { RedisService } from '../../../src/services/redis.service';
 
-describe('[Spec] RedisRepository', () => {
-  let redisRepository: RedisRepository;
+describe('[Spec] RedisService', () => {
+  let redisService: RedisService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,21 +25,16 @@ describe('[Spec] RedisRepository', () => {
           inject: [REDIS_FACTORY],
           useFactory: (redis: Redis) => new RedisRepository(redis),
         },
+        RedisService,
       ],
     }).compile();
 
-    redisRepository = module.get(IRedisRepository);
-  });
-
-  afterAll((done) => {
-    // Closing the DB connection allows Jest to exit successfully.
-    redisRepository.onModuleDestroy();
-    done();
+    redisService = module.get(IRedisRepository);
   });
 
   describe('[Init]', () => {
     it('should be defined', () => {
-      expect(redisRepository).toBeDefined();
+      expect(redisService).toBeDefined();
     });
   });
 
@@ -47,7 +43,7 @@ describe('[Spec] RedisRepository', () => {
       const prefix = uuidV4();
       const key = uuidV4();
 
-      const result = await redisRepository.get({ prefix, key });
+      const result = await redisService.get({ prefix, key });
 
       expect(result).toBeNull();
     });
@@ -59,10 +55,10 @@ describe('[Spec] RedisRepository', () => {
       const key = uuidV4();
       const value = uuidV4();
 
-      const saved = await redisRepository.set({ prefix, key, value });
+      const saved = await redisService.set({ prefix, key, value });
       expect(saved).toEqual(true);
 
-      const savedValue = await redisRepository.get({ prefix, key });
+      const savedValue = await redisService.get({ prefix, key });
       expect(value).toStrictEqual(savedValue);
     });
   });
