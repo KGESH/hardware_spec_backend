@@ -1,5 +1,5 @@
 import { IHardware } from './hardware.dto';
 
-export type IGpu = IHardware & {
+export type GpuDto = IHardware & {
   subVendorName?: string;
 };

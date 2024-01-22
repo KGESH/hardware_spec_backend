@@ -15,4 +15,4 @@ export type IResponseError<T> = {
   data?: T;
 };
 
-export type IResponse<T> = IResponseSuccess<T> | IResponseError<T>;
+export type ResponseDto<T> = IResponseSuccess<T> | IResponseError<T>;

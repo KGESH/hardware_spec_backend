@@ -1,3 +1,3 @@
-export type IOperatingSystem = {
+export type OsDto = {
   name: string;
 };

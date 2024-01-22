@@ -1,3 +1,3 @@
 import { IHardware } from './hardware.dto';
 
-export type IRam = IHardware & {};
+export type RamDto = IHardware;

@@ -1,6 +1,6 @@
 import { IHardware } from './hardware.dto';
 
-export type IDisk = IHardware & {
+export type DiskDto = IHardware & {
   kind?: string;
   totalSpace?: number;
 };

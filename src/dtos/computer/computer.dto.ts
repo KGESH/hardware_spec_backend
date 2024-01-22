@@ -1,15 +1,15 @@
-import { IOperatingSystem } from './os.dto';
-import { ICpu } from './cpu.dto';
-import { IMotherboard } from './motherboard.dto';
-import { IGpu } from './gpu.dto';
-import { IRam } from './ram.dto';
-import { IDisk } from './disk.dto';
+import { OsDto } from './os.dto';
+import { CpuDto } from './cpu.dto';
+import { MotherboardDto } from './motherboard.dto';
+import { GpuDto } from './gpu.dto';
+import { RamDto } from './ram.dto';
+import { DiskDto } from './disk.dto';
 
-export type IComputer = {
-  os: IOperatingSystem;
-  cpu: ICpu;
-  motherboard?: IMotherboard;
-  gpu?: IGpu;
-  rams: IRam[];
-  disks: IDisk[];
+export type ComputerDto = {
+  os?: OsDto;
+  cpu?: CpuDto;
+  motherboard?: MotherboardDto;
+  gpu?: GpuDto;
+  rams?: RamDto[];
+  disks?: DiskDto[];
 };
