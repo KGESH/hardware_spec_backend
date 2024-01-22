@@ -22,6 +22,7 @@
     "migrate:local": "dotenv -e .env.dev -- pnpm dlx prisma migrate dev"
   },
   "dependencies": {
+    "@langchain/core": "0.1.5",
     "@langchain/google-genai": "^0.0.7",
     "@nestia/core": "^2.4.5",
     "@nestia/e2e": "^0.4.1",

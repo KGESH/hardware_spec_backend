@@ -8,6 +8,9 @@ overrides:
   '@langchain/core': 0.1.5
 
 dependencies:
+  '@langchain/core':
+    specifier: 0.1.5
+    version: 0.1.5
   '@langchain/google-genai':
     specifier: ^0.0.7
     version: 0.0.7
