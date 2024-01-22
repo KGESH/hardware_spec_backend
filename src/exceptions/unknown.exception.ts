@@ -19,5 +19,6 @@ export class UnknownException<T> extends BusinessException<T> {
 
     // Only logging. Not response to client
     this.logger.error(e);
+    this.logger.error(data);
   }
 }
