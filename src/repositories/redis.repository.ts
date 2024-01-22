@@ -1,14 +1,14 @@
 import { IRedisRepository } from '../interfaces/redis.repository.interface';
 import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Redis } from 'ioredis';
-import { REDIS_FACTORY } from '../constants/redis.constant';
+import { REDIS } from '../constants/redis.constant';
 import { UnknownException } from '../exceptions/unknown.exception';
 
 @Injectable()
 export class RedisRepository implements IRedisRepository, OnModuleDestroy {
   private readonly logger = new Logger(RedisRepository.name);
 
-  constructor(@Inject(REDIS_FACTORY) private readonly redis: Redis) {}
+  constructor(@Inject(REDIS) private readonly redis: Redis) {}
 
   onModuleDestroy(): void {
     this.redis.disconnect();

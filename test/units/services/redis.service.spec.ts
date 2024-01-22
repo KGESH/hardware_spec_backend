@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { redisFactory } from '../../../src/modules/redis.module';
 import { IRedisRepository } from '../../../src/interfaces/redis.repository.interface';
 import { v4 as uuidV4 } from 'uuid';
-import { REDIS_FACTORY } from '../../../src/constants/redis.constant';
+import { REDIS } from '../../../src/constants/redis.constant';
 import { RedisRepository } from '../../../src/repositories/redis.repository';
 import { Redis } from 'ioredis';
 import { RedisService } from '../../../src/services/redis.service';
@@ -22,7 +22,7 @@ describe('[Spec] RedisService', () => {
         redisFactory,
         {
           provide: IRedisRepository,
-          inject: [REDIS_FACTORY],
+          inject: [REDIS],
           useFactory: (redis: Redis) => new RedisRepository(redis),
         },
         RedisService,
