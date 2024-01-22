@@ -29,4 +29,20 @@ export class RedisService {
   }): Promise<boolean> {
     return this.redisRepository.set({ prefix, key, value });
   }
+
+  async getDeserialize<T>({ prefix, key }: { prefix; key }) {
+    return this.redisRepository.getDeserialize<T>({ prefix, key });
+  }
+
+  async setSerialize<T>({
+    prefix,
+    key,
+    value,
+  }: {
+    prefix: string;
+    key: string;
+    value: T;
+  }): Promise<boolean> {
+    return this.redisRepository.setSerialize<T>({ prefix, key, value });
+  }
 }

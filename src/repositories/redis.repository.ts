@@ -2,6 +2,7 @@ import { IRedisRepository } from '../interfaces/redis.repository.interface';
 import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { REDIS_FACTORY } from '../constants/redis.constant';
+import { UnknownException } from '../exceptions/unknown.exception';
 
 @Injectable()
 export class RedisRepository implements IRedisRepository, OnModuleDestroy {
@@ -14,6 +15,16 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
     this.logger.log('Redis connection closed.');
   }
 
+  private _combinePrefix({
+    prefix,
+    key,
+  }: {
+    prefix: string;
+    key: string;
+  }): string {
+    return `${prefix}:${key}`;
+  }
+
   async get({
     prefix,
     key,
@@ -21,7 +32,14 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
     prefix: string;
     key: string;
   }): Promise<string | number | null> {
-    return this.redis.get(this._combinePrefix({ prefix, key }));
+    try {
+      return this.redis.get(this._combinePrefix({ prefix, key }));
+    } catch (e) {
+      throw new UnknownException(e, {
+        message: 'redis get error',
+        data: { prefix, key },
+      });
+    }
   }
 
   async set({
@@ -33,12 +51,19 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
     key: string;
     value: string | number;
   }): Promise<boolean> {
-    const saved = await this.redis.set(
-      this._combinePrefix({ prefix, key }),
-      value,
-    );
+    try {
+      const saved = await this.redis.set(
+        this._combinePrefix({ prefix, key }),
+        value,
+      );
 
-    return saved === 'OK';
+      return saved === 'OK';
+    } catch (e) {
+      throw new UnknownException(e, {
+        message: 'redis set error',
+        data: { prefix, key, value },
+      });
+    }
   }
 
   async delete({
@@ -69,13 +94,46 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
     );
   }
 
-  private _combinePrefix({
+  async getDeserialize<T>({
     prefix,
     key,
   }: {
     prefix: string;
     key: string;
-  }): string {
-    return `${prefix}:${key}`;
+  }): Promise<T | null> {
+    try {
+      const data = await this.redis.get(this._combinePrefix({ prefix, key }));
+
+      if (!data) return null;
+
+      return JSON.parse(data);
+    } catch (e) {
+      throw new UnknownException(e, {
+        message: 'redis get deserialize error',
+        data: { prefix, key },
+      });
+    }
+  }
+  async setSerialize<T>({
+    prefix,
+    key,
+    value,
+  }: {
+    prefix: string;
+    key: string;
+    value: T;
+  }): Promise<boolean> {
+    try {
+      const saved = await this.redis.set(
+        this._combinePrefix({ prefix, key }),
+        JSON.stringify(value),
+      );
+      return saved === 'OK';
+    } catch (e) {
+      throw new UnknownException(e, {
+        message: 'redis set serialize error',
+        data: { prefix, key, value },
+      });
+    }
   }
 }

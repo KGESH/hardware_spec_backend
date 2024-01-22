@@ -36,4 +36,22 @@ export abstract class IRedisRepository {
     value: string | number;
     expiry: number;
   }): Promise<void>;
+
+  abstract getDeserialize<T>({
+    prefix,
+    key,
+  }: {
+    prefix: string;
+    key: string;
+  }): Promise<T | null>;
+
+  abstract setSerialize<T>({
+    prefix,
+    key,
+    value,
+  }: {
+    prefix: string;
+    key: string;
+    value: T;
+  }): Promise<boolean>;
 }
