@@ -22,8 +22,6 @@ const aiModelFactory: FactoryProvider = {
 };
 
 @Module({
-  imports: [],
-  controllers: [],
   providers: [aiModelFactory, LangChainService],
   exports: [LangChainService],
 })

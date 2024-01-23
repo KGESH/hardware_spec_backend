@@ -6,7 +6,7 @@ export const currencySchema = z.union([
   z.literal('JPY'),
 ]);
 
-export const responseSchema = z.object({
+export const aiResponseSchema = z.object({
   name: z.string(),
   tablePrice: z.number().positive(),
   buyingPrice: z.number().positive(),

@@ -3,6 +3,7 @@ export const AI_MODEL_NAME = 'gemini-pro';
 
 export const AI_SAMPLE_PROMPT =
   'You are an AI designed to estimate the buying price of a wide range of used PC hardware, including CPUs, GPUs, motherboards, RAM, and storage devices. ' +
+  `Be careful check model name's detail like K or F model.` +
   'Upon receiving a query about a specific hardware model, your task is to analyze it and respond with the estimated buying price in JSON format. ' +
   "The JSON response should include the hardware's name, its table price (standard market price), the buying price (typically 50% of the table price), and the currency (KRW). " +
   'answer to json format. buyingPrice field is tablePrice * 0.5. currency is matched to the currency of the tablePrice.' +

@@ -1,3 +1,4 @@
 export const REDIS = 'REDIS_FACTORY';
 export const REDIS_PUB = 'REDIS_PUB';
+export const REDIS_SYSTEM_INFO_PREFIX = 'SYSTEM_INFO';
 export const REDIS_ESTIMATE_PREFIX = 'ESTIMATE';

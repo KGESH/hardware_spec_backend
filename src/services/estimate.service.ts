@@ -7,7 +7,10 @@ import {
 } from '../dtos/estimate/estimate.dto';
 import { ComputerDto } from '../dtos/computer/computer.dto';
 import { RedisService } from './redis.service';
-import { REDIS_ESTIMATE_PREFIX } from '../constants/redis.constant';
+import {
+  REDIS_ESTIMATE_PREFIX,
+  REDIS_SYSTEM_INFO_PREFIX,
+} from '../constants/redis.constant';
 import { SampleEstimateRepository } from '../repositories/sampleEstimate.repository';
 import {
   SampleEstimateDto,
@@ -15,6 +18,7 @@ import {
 } from '../dtos/estimate/sampleEstimate.dto';
 import { EntityConflictException } from '../exceptions/entityConflict.exception';
 import { EntityNotfoundException } from '../exceptions/entityNotfound.exception';
+import { EstimateAIResponseDto } from '../dtos/estimate/ai.dto';
 
 @Injectable()
 export class EstimateService {
@@ -34,7 +38,7 @@ export class EstimateService {
 
   async cacheSystemInfo(encodedId: string, dto: ComputerDto): Promise<string> {
     await this.redisService.setSerialize({
-      prefix: REDIS_ESTIMATE_PREFIX,
+      prefix: REDIS_SYSTEM_INFO_PREFIX,
       key: encodedId,
       value: dto,
     });
@@ -44,6 +48,26 @@ export class EstimateService {
 
   async getCachedSystemInfo(encodedId: string): Promise<ComputerDto | null> {
     return await this.redisService.getDeserialize<ComputerDto>({
+      prefix: REDIS_SYSTEM_INFO_PREFIX,
+      key: encodedId,
+    });
+  }
+
+  async cacheEstimate(
+    encodedId: string,
+    dto: EstimateAIResponseDto,
+  ): Promise<boolean> {
+    return await this.redisService.setSerialize({
+      prefix: REDIS_ESTIMATE_PREFIX,
+      key: encodedId,
+      value: dto,
+    });
+  }
+
+  async getCachedEstimate(
+    encodedId: string,
+  ): Promise<EstimateAIResponseDto | null> {
+    return await this.redisService.getDeserialize<EstimateAIResponseDto>({
       prefix: REDIS_ESTIMATE_PREFIX,
       key: encodedId,
     });

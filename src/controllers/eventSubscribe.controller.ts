@@ -43,11 +43,15 @@ export class EventSubscribeController {
     //   });
     // }
 
-    const response = await this.estimateAIService.requestEstimate(data);
+    const estimate = await this.estimateAIService.requestEstimate(data);
 
-    this.logger.debug(systemInfo);
+    await this.estimateService.cacheEstimate(encodedId, estimate);
+
+    const aiEstimate = await this.estimateService.getCachedEstimate(encodedId);
+
+    this.logger.debug(aiEstimate);
     this.logger.debug('EventPattern EXTERNAL API REQUEST DONE');
 
-    return { message: 'DONE', response };
+    return { message: 'DONE', aiEstimate };
   }
 }
