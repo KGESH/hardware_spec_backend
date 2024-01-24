@@ -16,7 +16,7 @@ export type EstimateAIAnswerErrorDto = {
 
 export type EstimateAIAnswerSuccessDto = {
   status: 'success';
-  estimate: EstimateAIAnswerDto;
+  estimates: EstimateAIAnswerDto[];
 };
 
 export type EstimateAIResponseDto =

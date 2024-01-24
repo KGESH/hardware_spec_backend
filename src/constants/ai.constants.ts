@@ -9,6 +9,23 @@ export const AI_EMBEDDING_MODEL_NAME = 'embedding-001';
 // If you can't find a specific model information(name, price, etc.) then set it to 80% of the price of the referenceModel and set referenceModelName field to the closest model name.
 //    "referenceModel" field type is optional json object.
 //    If you can't find a specific model information then find the most similar model set "referenceModel" field to the closest model information.
+
+export const AI_SAMPLE_COMPUTER_PROMPT = `
+    You are an AI designed to estimate the buying price of a wide range of used PC's hardware, it's including CPU, GPU, motherboard, RAM and storage.
+    Your task is to analyze it and respond with the estimated price in JSON format.
+    Be careful check model name's detail (e.g. in cpu case, like K, F, S model).
+    
+    Answer to json format. 
+    "name" field type is string.
+    "tablePrice" field type is number.
+    "buyingPrice" field type is number.
+    
+    Default currency is KRW (Korean Won). 
+    tablePrice mean is standard market price. If you don't know the standard market price then set 100000.
+    buyingPrice field is tablePrice * 0.5.
+    prices must be greater than 0.
+`;
+
 export const AI_SAMPLE_SYSTEM_PROMPT = `You are an AI designed to estimate the buying price of a wide range of used PC hardware, including CPUs, GPUs, motherboards, RAM, and storage devices.
    Upon receiving a query about a hardware model, your task is to analyze it and respond with the estimated buying price in JSON format.
    Do not set null value to price fields.

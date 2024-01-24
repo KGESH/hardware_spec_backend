@@ -27,7 +27,7 @@ export class EstimateController {
 
     const estimate = await this.estimateService.getCachedEstimate(encodedId);
 
-    this.logger.debug(`Estimate`, estimate);
+    this.logger.verbose(`Estimate`, estimate);
 
     if (!estimate) {
       throw new EntityNotfoundException({

@@ -37,7 +37,7 @@ export class LangChainService {
 
     try {
       const aiResponse = await chain.invoke({ query });
-      return aiResponse;
+      return aiResponse as T;
     } catch (e) {
       this.logger.error(e);
       throw new UnknownException(e);
