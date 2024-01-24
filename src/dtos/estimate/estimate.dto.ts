@@ -17,7 +17,7 @@ export type EstimateUpdateDto = Pick<EstimateDto, 'id'> &
 
 export type EstimateQueryDto = Pick<EstimateDto, 'id'>;
 
-export type EstimatePredictDto = {
+export type EstimateRequestDto = {
   encodedId: string & tags.Format<'uuid'>;
   computer: ComputerDto;
 };

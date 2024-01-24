@@ -5,12 +5,8 @@ import {
   EstimateDto,
   EstimateQueryDto,
 } from '../dtos/estimate/estimate.dto';
-import { ComputerDto } from '../dtos/computer/computer.dto';
 import { RedisService } from './redis.service';
-import {
-  REDIS_ESTIMATE_PREFIX,
-  REDIS_SYSTEM_INFO_PREFIX,
-} from '../constants/redis.constant';
+import { REDIS_ESTIMATE_PREFIX } from '../constants/redis.constant';
 import { SampleEstimateRepository } from '../repositories/sampleEstimate.repository';
 import {
   SampleEstimateDto,
@@ -34,23 +30,6 @@ export class EstimateService {
 
   async createEstimate(dto: EstimateCreateDto): Promise<EstimateDto> {
     return await this.estimateRepository.create(dto);
-  }
-
-  async cacheSystemInfo(encodedId: string, dto: ComputerDto): Promise<string> {
-    await this.redisService.setSerialize({
-      prefix: REDIS_SYSTEM_INFO_PREFIX,
-      key: encodedId,
-      value: dto,
-    });
-
-    return encodedId;
-  }
-
-  async getCachedSystemInfo(encodedId: string): Promise<ComputerDto | null> {
-    return await this.redisService.getDeserialize<ComputerDto>({
-      prefix: REDIS_SYSTEM_INFO_PREFIX,
-      key: encodedId,
-    });
   }
 
   async cacheEstimate(

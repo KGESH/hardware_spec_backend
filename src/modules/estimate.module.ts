@@ -6,9 +6,10 @@ import { PrismaModule } from './prisma.module';
 import { EstimateService } from '../services/estimate.service';
 import { EstimateRepository } from '../repositories/estimate.repository';
 import { SampleEstimateRepository } from '../repositories/sampleEstimate.repository';
+import { ComputerModule } from './computer.module';
 
 @Module({
-  imports: [PrismaModule, RedisModule, EventPublishModule],
+  imports: [PrismaModule, RedisModule, EventPublishModule, ComputerModule],
   controllers: [EstimateController],
   providers: [EstimateService, EstimateRepository, SampleEstimateRepository],
   exports: [EstimateService],

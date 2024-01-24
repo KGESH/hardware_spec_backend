@@ -3,9 +3,10 @@ import { EventSubscribeController } from '../controllers/eventSubscribe.controll
 import { EstimateModule } from './estimate.module';
 import { EstimateAIService } from '../services/estimateAI.service';
 import { LangChainModule } from './langChain.module';
+import { RedisModule } from './redis.module';
 
 @Module({
-  imports: [EstimateModule, LangChainModule],
+  imports: [RedisModule, EstimateModule, LangChainModule],
   controllers: [EventSubscribeController],
   providers: [EstimateAIService],
 })

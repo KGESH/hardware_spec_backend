@@ -4,7 +4,10 @@ import { ResponseDto } from '../dtos/response/response.dto';
 import { ComputerDto } from '../dtos/computer/computer.dto';
 import { EventPublishService } from '../services/eventPublish.service';
 import { EstimateService } from '../services/estimate.service';
-import { EstimatePredictDto } from '../dtos/estimate/estimate.dto';
+import { EstimateRequestDto } from '../dtos/estimate/estimate.dto';
+import { ComputerService } from '../services/computer.service';
+import { EstimateAIResponseDto } from '../dtos/estimate/ai.dto';
+import { EntityNotfoundException } from '../exceptions/entityNotfound.exception';
 
 @Controller('estimate')
 export class EstimateController {
@@ -12,40 +15,53 @@ export class EstimateController {
 
   constructor(
     private readonly estimateService: EstimateService,
+    private readonly computerService: ComputerService,
     private readonly eventService: EventPublishService,
   ) {}
 
   @TypedRoute.Get('/:id')
   async getEstimate(
-    @TypedParam('id') id: string,
-  ): Promise<ResponseDto<string>> {
-    this.logger.debug(`GET`, id);
+    @TypedParam('id') encodedId: string,
+  ): Promise<ResponseDto<EstimateAIResponseDto>> {
+    this.logger.debug(`EncodedId`, encodedId);
 
-    // emit event to my gateway
-    // this.eventService.emit('estimate', { message: 'hello, world!' });
+    const estimate = await this.estimateService.getCachedEstimate(encodedId);
 
-    // return immediately
+    this.logger.debug(`Estimate`, estimate);
+
+    if (!estimate) {
+      throw new EntityNotfoundException({
+        message: `Estimate not found`,
+      });
+    }
+
+    if (estimate.status === 'error') {
+      throw new EntityNotfoundException({
+        message: `Estimate created error`,
+      });
+    }
+
     return {
       status: 'success',
-      data: `request accept ${id}`,
+      data: estimate,
     };
   }
 
   @TypedRoute.Post('/:id')
-  async createEstimate(
+  async createEstimatePredict(
     @TypedParam('id') encodedId: string,
-    @TypedBody() dto: ComputerDto,
+    @TypedBody() computerDto: ComputerDto,
   ): Promise<ResponseDto<string>> {
-    this.logger.debug(`Body`, encodedId, dto);
+    this.logger.debug(`Body`, encodedId, computerDto);
 
-    const aiPredictDto: EstimatePredictDto = {
+    const aiRequestDto: EstimateRequestDto = {
       encodedId,
-      computer: dto,
+      computer: computerDto,
     };
 
-    await this.estimateService.cacheSystemInfo(encodedId, dto);
+    await this.computerService.cacheComputerSpec(encodedId, computerDto);
 
-    await this.eventService.emit('estimate', aiPredictDto);
+    await this.eventService.emit('estimate', aiRequestDto);
 
     return {
       status: 'success',
