@@ -1,4 +1,25 @@
 import { z } from 'zod';
-import { aiResponseSchema } from '../../schemas/langchain.schema';
+import { aiAnswerSchema } from '../../schemas/langchain.schema';
 
-export type EstimateAIResponseDto = z.infer<typeof aiResponseSchema>;
+export type EstimateAIAnswerDto = z.infer<typeof aiAnswerSchema>;
+
+export type EstimateAIPredictStatus = 'pending' | 'success' | 'error';
+
+export type EstimateAIAnswerPendingDto = {
+  status: 'pending';
+};
+
+export type EstimateAIAnswerErrorDto = {
+  status: 'error';
+  message: string;
+};
+
+export type EstimateAIAnswerSuccessDto = {
+  status: 'success';
+  estimate: EstimateAIAnswerDto;
+};
+
+export type EstimateAIResponseDto =
+  | EstimateAIAnswerSuccessDto
+  | EstimateAIAnswerPendingDto
+  | EstimateAIAnswerErrorDto;

@@ -12,8 +12,9 @@ const aiModelFactory: FactoryProvider = {
     try {
       return new ChatGoogleGenerativeAI({
         modelName: AI_MODEL_NAME,
-        maxOutputTokens: 1024,
         apiKey: configService.get('GOOGLE_API_KEY'),
+        maxOutputTokens: 1024,
+        temperature: 0,
       });
     } catch (e) {
       throw new UnknownException(e);

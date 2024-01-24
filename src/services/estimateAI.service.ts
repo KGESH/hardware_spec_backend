@@ -1,25 +1,49 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { LangChainService } from './langChain.service';
-import { EstimatePredictDto } from '../dtos/estimate/estimate.dto';
-import { AI_SAMPLE_PROMPT } from '../constants/ai.constants';
-import { EstimateAIResponseDto } from '../dtos/estimate/ai.dto';
-import { aiResponseSchema } from '../schemas/langchain.schema';
+import { EstimateRequestDto } from '../dtos/estimate/estimate.dto';
+import { AI_SAMPLE_SYSTEM_PROMPT } from '../constants/ai.constants';
+import {
+  EstimateAIAnswerPendingDto,
+  EstimateAIAnswerSuccessDto,
+} from '../dtos/estimate/ai.dto';
+import { aiAnswerSchema } from '../schemas/langchain.schema';
+import { EstimateService } from './estimate.service';
 
 @Injectable()
 export class EstimateAIService {
   private readonly logger = new Logger(EstimateAIService.name);
 
-  constructor(private readonly langChainService: LangChainService) {}
+  constructor(
+    private readonly langChainService: LangChainService,
+    private readonly estimateService: EstimateService,
+  ) {}
 
   async requestEstimate(
-    dto: EstimatePredictDto,
-  ): Promise<EstimateAIResponseDto> {
+    dto: EstimateRequestDto,
+  ): Promise<EstimateAIAnswerSuccessDto> {
     this.logger.debug(dto);
-    return this.langChainService.chatToAI({
-      systemInput: AI_SAMPLE_PROMPT,
-      // userInput: `${dto.computer.cpu?.displayName}`,
-      userInput: 'Intel core i9 12900',
-      responseSchema: aiResponseSchema,
+    const pending: EstimateAIAnswerPendingDto = {
+      status: 'pending',
+    };
+
+    // Cache created status
+    await this.estimateService.cacheEstimate(dto.encodedId, pending);
+
+    // Todo: replace query
+    const aiResponse = await this.langChainService.chatToAI({
+      systemInput: AI_SAMPLE_SYSTEM_PROMPT,
+      // query: `${dto.computer.cpu?.displayName}`,
+      query: 'Intel core i9 12900',
+      responseSchema: aiAnswerSchema,
     });
+
+    const done: EstimateAIAnswerSuccessDto = {
+      status: 'success',
+      estimate: aiResponse,
+    };
+
+    await this.estimateService.cacheEstimate(dto.encodedId, done);
+
+    return done;
   }
 }
