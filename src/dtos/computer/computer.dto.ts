@@ -13,3 +13,10 @@ export type ComputerDto = {
   rams?: RamDto[];
   disks?: DiskDto[];
 };
+
+export type SystemInfoDto = {
+  encodedId: string;
+  computer: ComputerDto;
+};
+
+export type SystemInfoQuery = Pick<SystemInfoDto, 'encodedId'>;
