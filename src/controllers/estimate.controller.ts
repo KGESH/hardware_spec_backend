@@ -59,9 +59,12 @@ export class EstimateController {
       computer: computerDto,
     };
 
-    await this.computerService.cacheComputerSpec(encodedId, computerDto);
+    const isCreated = await this.estimateService.getCachedEstimate(encodedId);
 
-    await this.eventService.emit('estimate', aiRequestDto);
+    if (!isCreated) {
+      await this.computerService.cacheComputerSpec(encodedId, computerDto);
+      await this.eventService.emit('estimate', aiRequestDto);
+    }
 
     return {
       status: 'success',
