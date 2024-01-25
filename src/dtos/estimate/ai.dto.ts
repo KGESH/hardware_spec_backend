@@ -1,25 +1,31 @@
 import { z } from 'zod';
 import { aiAnswerSchema } from '../../schemas/langchain.schema';
+import { tags } from 'typia';
+import { IHardware } from '../computer/hardware.dto';
 
-export type EstimateAIAnswerDto = z.infer<typeof aiAnswerSchema>;
+export type AIEstimateAnswerDto = z.infer<typeof aiAnswerSchema>;
 
-export type EstimateAIPredictStatus = 'pending' | 'success' | 'error';
+export type AIEstimatePartDto = {
+  shopId: string & tags.Format<'uuid'>;
+  hardware: IHardware;
+  estimate: AIEstimateAnswerDto;
+};
 
-export type EstimateAIAnswerPendingDto = {
+export type AIEstimatePendingDto = {
   status: 'pending';
 };
 
-export type EstimateAIAnswerErrorDto = {
+export type AIEstimateErrorDto = {
   status: 'error';
   message: string;
 };
 
-export type EstimateAIAnswerSuccessDto = {
+export type AIEstimateSuccessDto = {
   status: 'success';
-  estimates: EstimateAIAnswerDto[];
+  estimates: AIEstimatePartDto[];
 };
 
-export type EstimateAIResponseDto =
-  | EstimateAIAnswerSuccessDto
-  | EstimateAIAnswerPendingDto
-  | EstimateAIAnswerErrorDto;
+export type AIEstimateResponseDto =
+  | AIEstimateSuccessDto
+  | AIEstimatePendingDto
+  | AIEstimateErrorDto;

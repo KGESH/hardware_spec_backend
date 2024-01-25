@@ -10,6 +10,11 @@ export type EstimateDto = {
   deletedAt?: string & tags.Format<'date-time'>;
 };
 
+export type EstimateCacheDto = {
+  encodedId: string;
+  shopId: string & tags.Format<'uuid'>;
+};
+
 export type EstimateCreateDto = Pick<EstimateDto, 'name' | 'cpuId'>;
 
 export type EstimateUpdateDto = Pick<EstimateDto, 'id'> &
@@ -19,5 +24,6 @@ export type EstimateQueryDto = Pick<EstimateDto, 'id'>;
 
 export type EstimateRequestDto = {
   encodedId: string & tags.Format<'uuid'>;
+  shopId: string & tags.Format<'uuid'>;
   computer: ComputerDto;
 };

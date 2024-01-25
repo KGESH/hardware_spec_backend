@@ -2,6 +2,7 @@ import { Controller, Logger } from '@nestjs/common';
 import { EventPattern, Payload, Transport } from '@nestjs/microservices';
 import { EstimateRequestDto } from '../dtos/estimate/estimate.dto';
 import { EstimateAIService } from '../services/estimateAI.service';
+import { ESTIMATE_CREATE_EVENT } from '../constants/estimate.constant';
 
 @Controller()
 export class EventSubscribeController {
@@ -9,7 +10,7 @@ export class EventSubscribeController {
 
   constructor(private readonly estimateAIService: EstimateAIService) {}
 
-  @EventPattern('estimate', Transport.REDIS)
+  @EventPattern(ESTIMATE_CREATE_EVENT, Transport.REDIS)
   async requestEstimate(@Payload() data: EstimateRequestDto): Promise<any> {
     this.logger.debug('EventPattern EXTERNAL API REQUEST START', data);
 

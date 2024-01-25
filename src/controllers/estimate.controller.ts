@@ -6,12 +6,15 @@ import { EventPublishService } from '../services/eventPublish.service';
 import { EstimateService } from '../services/estimate.service';
 import { EstimateRequestDto } from '../dtos/estimate/estimate.dto';
 import { ComputerService } from '../services/computer.service';
-import { EstimateAIResponseDto } from '../dtos/estimate/ai.dto';
+import { AIEstimateResponseDto } from '../dtos/estimate/ai.dto';
 import { EntityNotfoundException } from '../exceptions/entityNotfound.exception';
+import { ESTIMATE_CREATE_EVENT } from '../constants/estimate.constant';
+import { v4 as uuidV4 } from 'uuid';
 
 @Controller('estimate')
 export class EstimateController {
   private readonly logger = new Logger(EstimateController.name);
+  private readonly shopId = uuidV4(); // Todo: replace to real shopId
 
   constructor(
     private readonly estimateService: EstimateService,
@@ -22,10 +25,13 @@ export class EstimateController {
   @TypedRoute.Get('/:id')
   async getEstimate(
     @TypedParam('id') encodedId: string,
-  ): Promise<ResponseDto<EstimateAIResponseDto>> {
+  ): Promise<ResponseDto<AIEstimateResponseDto>> {
     this.logger.debug(`EncodedId`, encodedId);
 
-    const estimate = await this.estimateService.getCachedEstimate(encodedId);
+    const estimate = await this.estimateService.getCachedEstimate({
+      shopId: this.shopId,
+      encodedId,
+    });
 
     this.logger.verbose(`Estimate`, estimate);
 
@@ -55,15 +61,19 @@ export class EstimateController {
     this.logger.debug(`Body`, encodedId, computerDto);
 
     const aiRequestDto: EstimateRequestDto = {
+      shopId: this.shopId,
       encodedId,
       computer: computerDto,
     };
 
-    const isCreated = await this.estimateService.getCachedEstimate(encodedId);
+    const isCreated = await this.estimateService.getCachedEstimate({
+      shopId: this.shopId,
+      encodedId,
+    });
 
     if (!isCreated) {
       await this.computerService.cacheComputerSpec(encodedId, computerDto);
-      await this.eventService.emit('estimate', aiRequestDto);
+      await this.eventService.emit(ESTIMATE_CREATE_EVENT, aiRequestDto);
     }
 
     return {
