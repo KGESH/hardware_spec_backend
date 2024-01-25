@@ -1,4 +1,9 @@
-import { IRedisRepository } from '../interfaces/redis.repository.interface';
+import {
+  IRedisDeleteArgs,
+  IRedisGetArgs,
+  IRedisRepository,
+  IRedisSetArgs,
+} from '../interfaces/redis.repository.interface';
 import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { REDIS } from '../constants/redis.constant';
@@ -25,13 +30,7 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
     return `${prefix}:${key}`;
   }
 
-  async get({
-    prefix,
-    key,
-  }: {
-    prefix: string;
-    key: string;
-  }): Promise<string | number | null> {
+  async get({ prefix, key }: IRedisGetArgs): Promise<string | number | null> {
     try {
       return this.redis.get(this._combinePrefix({ prefix, key }));
     } catch (e) {
@@ -46,17 +45,15 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
     prefix,
     key,
     value,
-  }: {
-    prefix: string;
-    key: string;
-    value: string | number;
-  }): Promise<boolean> {
+    expiry,
+  }: IRedisSetArgs<string | number>): Promise<boolean> {
     try {
       const saved = await this.redis.set(
         this._combinePrefix({ prefix, key }),
         value,
+        'EX',
+        expiry ?? 600, // seconds
       );
-
       return saved === 'OK';
     } catch (e) {
       throw new UnknownException(e, {
@@ -66,41 +63,7 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
     }
   }
 
-  async delete({
-    prefix,
-    key,
-  }: {
-    prefix: string;
-    key: string;
-  }): Promise<void> {
-    await this.redis.del(this._combinePrefix({ prefix, key }));
-  }
-  async setWithExpiry({
-    prefix,
-    key,
-    value,
-    expiry,
-  }: {
-    prefix: string;
-    key: string;
-    value: string | number;
-    expiry: number;
-  }): Promise<void> {
-    await this.redis.set(
-      this._combinePrefix({ prefix, key }),
-      value,
-      'EX',
-      expiry,
-    );
-  }
-
-  async getDeserialize<T>({
-    prefix,
-    key,
-  }: {
-    prefix: string;
-    key: string;
-  }): Promise<T | null> {
+  async getDeserialize<T>({ prefix, key }: IRedisGetArgs): Promise<T | null> {
     try {
       const data = await this.redis.get(this._combinePrefix({ prefix, key }));
 
@@ -114,19 +77,19 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
       });
     }
   }
+
   async setSerialize<T>({
     prefix,
     key,
     value,
-  }: {
-    prefix: string;
-    key: string;
-    value: T;
-  }): Promise<boolean> {
+    expiry,
+  }: IRedisSetArgs<T>): Promise<boolean> {
     try {
       const saved = await this.redis.set(
         this._combinePrefix({ prefix, key }),
         JSON.stringify(value),
+        'EX',
+        expiry ?? 600, // seconds
       );
       return saved === 'OK';
     } catch (e) {
@@ -135,5 +98,9 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
         data: { prefix, key, value },
       });
     }
+  }
+
+  async delete({ prefix, key }: IRedisDeleteArgs): Promise<void> {
+    await this.redis.del(this._combinePrefix({ prefix, key }));
   }
 }

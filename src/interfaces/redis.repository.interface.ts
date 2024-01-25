@@ -1,57 +1,25 @@
+export type IRedisGetArgs = {
+  prefix: string;
+  key: string;
+};
+
+export type IRedisSetArgs<T> = {
+  prefix: string;
+  key: string;
+  value: T;
+  expiry?: number;
+};
+
+export type IRedisDeleteArgs = IRedisGetArgs;
+
 export abstract class IRedisRepository {
-  abstract get({
-    prefix,
-    key,
-  }: {
-    prefix: string;
-    key: string;
-  }): Promise<string | number | null>;
+  abstract get(args: IRedisGetArgs): Promise<string | number | null>;
 
-  abstract set({
-    prefix,
-    key,
-    value,
-  }: {
-    prefix: string;
-    key: string;
-    value: string | number;
-  }): Promise<boolean>;
+  abstract set(args: IRedisSetArgs<string | number>): Promise<boolean>;
 
-  abstract delete({
-    prefix,
-    key,
-  }: {
-    prefix: string;
-    key: string;
-  }): Promise<void>;
+  abstract delete(args: IRedisDeleteArgs): Promise<void>;
 
-  abstract setWithExpiry({
-    prefix,
-    key,
-    value,
-    expiry,
-  }: {
-    prefix: string;
-    key: string;
-    value: string | number;
-    expiry: number;
-  }): Promise<void>;
+  abstract getDeserialize<T>(args: IRedisGetArgs): Promise<T | null>;
 
-  abstract getDeserialize<T>({
-    prefix,
-    key,
-  }: {
-    prefix: string;
-    key: string;
-  }): Promise<T | null>;
-
-  abstract setSerialize<T>({
-    prefix,
-    key,
-    value,
-  }: {
-    prefix: string;
-    key: string;
-    value: T;
-  }): Promise<boolean>;
+  abstract setSerialize<T>(args: IRedisSetArgs<T>): Promise<boolean>;
 }
