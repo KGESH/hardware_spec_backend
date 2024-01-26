@@ -29,12 +29,13 @@ export class EstimateAIService {
   async requestEstimate({
     shopId,
     encodedId,
+    estimateId,
     computer,
   }: EstimateRequestDto): Promise<AIEstimateResponseDto> {
     // Cache created status
     await this.estimateService.cacheEstimate(
-      { shopId, encodedId },
-      { status: 'pending' },
+      { shopId, estimateId },
+      { status: 'pending', shopId, encodedId, estimateId },
     );
 
     const { cpu, gpu, motherboard, rams, disks } = computer;
@@ -75,7 +76,7 @@ export class EstimateAIService {
     // Cache new AI estimate parts
     const willCachePromises = aiResponses.map((aiResponse) => {
       return this.estimateService.cacheEstimatePart({
-        ...aiResponse,
+        estimatePart: aiResponse,
         expiry: 600, // seconds
       });
     });
@@ -91,15 +92,21 @@ export class EstimateAIService {
         ? {
             status: 'error',
             message: 'Estimate not created',
+            shopId,
+            encodedId,
+            estimateId,
           }
         : {
             status: 'success',
+            shopId,
+            encodedId,
+            estimateId,
             estimates: [...cachedEstimates, ...aiResponses],
           };
 
     // Cache created estimate
     await this.estimateService.cacheEstimate(
-      { shopId, encodedId },
+      { shopId, estimateId },
       estimateDto,
     );
 

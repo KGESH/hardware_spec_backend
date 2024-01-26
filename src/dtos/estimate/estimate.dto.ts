@@ -11,8 +11,9 @@ export type EstimateDto = {
 };
 
 export type EstimateCacheDto = {
-  encodedId: string;
   shopId: string & tags.Format<'uuid'>;
+  estimateId: string & tags.Format<'uuid'>;
+  encodedId: string;
 };
 
 export type EstimateCreateDto = Pick<EstimateDto, 'name' | 'cpuId'>;
@@ -23,7 +24,17 @@ export type EstimateUpdateDto = Pick<EstimateDto, 'id'> &
 export type EstimateQueryDto = Pick<EstimateDto, 'id'>;
 
 export type EstimateRequestDto = {
-  encodedId: string & tags.Format<'uuid'>;
   shopId: string & tags.Format<'uuid'>;
+  estimateId: string & tags.Format<'uuid'>;
+  encodedId: string;
   computer: ComputerDto;
+};
+
+type EstimateCreateStatus = 'pending' | 'exist' | 'changed' | 'error';
+
+export type EstimateCreateResponseDto = {
+  status: EstimateCreateStatus;
+  shopId: string & tags.Format<'uuid'>;
+  encodedId: string;
+  estimateId: string;
 };

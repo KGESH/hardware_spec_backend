@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { aiAnswerSchema } from '../../schemas/langchain.schema';
 import { tags } from 'typia';
 import { IHardware } from '../computer/hardware.dto';
+import { EstimateCacheDto } from './estimate.dto';
 
 export type AIEstimateAnswerDto = z.infer<typeof aiAnswerSchema>;
 
@@ -11,16 +12,16 @@ export type AIEstimatePartDto = {
   estimate: AIEstimateAnswerDto;
 };
 
-export type AIEstimatePendingDto = {
+export type AIEstimatePendingDto = EstimateCacheDto & {
   status: 'pending';
 };
 
-export type AIEstimateErrorDto = {
+export type AIEstimateErrorDto = EstimateCacheDto & {
   status: 'error';
   message: string;
 };
 
-export type AIEstimateSuccessDto = {
+export type AIEstimateSuccessDto = EstimateCacheDto & {
   status: 'success';
   estimates: AIEstimatePartDto[];
 };

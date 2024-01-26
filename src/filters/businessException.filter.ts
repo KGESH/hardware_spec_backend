@@ -9,7 +9,6 @@ export class BusinessExceptionFilter<T> implements ExceptionFilter {
 
   catch(exception: BusinessException<T>, host: ArgumentsHost) {
     this.logger.error('Exception', exception);
-    this.logger.error('Host', host);
 
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

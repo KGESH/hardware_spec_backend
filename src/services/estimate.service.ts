@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EstimateRepository } from '../repositories/estimate.repository';
 import {
   EstimateCacheDto,
@@ -27,6 +27,8 @@ import {
 
 @Injectable()
 export class EstimateService {
+  private readonly logger = new Logger(EstimateService.name);
+
   constructor(
     private readonly estimateRepository: EstimateRepository,
     private readonly sampleEstimateRepository: SampleEstimateRepository,
@@ -42,13 +44,13 @@ export class EstimateService {
   }
 
   async cacheEstimate(
-    cacheDto: EstimateCacheDto,
+    { shopId, estimateId }: Pick<EstimateCacheDto, 'shopId' | 'estimateId'>,
     estimateDto: AIEstimateResponseDto,
     expiry?: number,
   ): Promise<boolean> {
     return await this.redisService.setSerialize({
-      prefix: REDIS_ESTIMATE_PREFIX(cacheDto.shopId),
-      key: cacheDto.encodedId,
+      prefix: REDIS_ESTIMATE_PREFIX(shopId),
+      key: estimateId,
       value: estimateDto,
       expiry,
     });
@@ -56,24 +58,36 @@ export class EstimateService {
 
   async getCachedEstimate({
     shopId,
-    encodedId,
-  }: EstimateCacheDto): Promise<AIEstimateResponseDto | null> {
+    estimateId,
+  }: Pick<
+    EstimateCacheDto,
+    'shopId' | 'estimateId'
+  >): Promise<AIEstimateResponseDto | null> {
     return await this.redisService.getDeserialize<AIEstimateResponseDto>({
       prefix: REDIS_ESTIMATE_PREFIX(shopId),
-      key: encodedId,
+      key: estimateId,
     });
   }
 
   async cacheEstimatePart({
-    shopId,
-    hardware,
-    estimate,
+    estimatePart,
     expiry,
-  }: AIEstimatePartDto & { expiry?: number }): Promise<boolean> {
-    return await this.redisService.setSerialize<AIEstimateAnswerDto>({
-      prefix: REDIS_ESTIMATE_HARDWARE_PART_PREFIX(hardware.type),
-      key: REDIS_ESTIMATE_HARDWARE_PART_KEY({ shopId, hardware }),
-      value: estimate,
+  }: {
+    estimatePart: AIEstimatePartDto;
+    expiry?: number;
+  }): Promise<boolean> {
+    this.logger.debug(
+      'Cache Estimate Part',
+      estimatePart.hardware,
+      estimatePart.estimate,
+    );
+    return await this.redisService.setSerialize<AIEstimatePartDto>({
+      prefix: REDIS_ESTIMATE_HARDWARE_PART_PREFIX(estimatePart.hardware.type),
+      key: REDIS_ESTIMATE_HARDWARE_PART_KEY({
+        shopId: estimatePart.shopId,
+        hardware: estimatePart.hardware,
+      }),
+      value: estimatePart,
       expiry,
     });
   }
