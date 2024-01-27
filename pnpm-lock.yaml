@@ -124,6 +124,9 @@ devDependencies:
   prisma:
     specifier: ^5.8.1
     version: 5.8.1
+  prisma-markdown:
+    specifier: ^1.0.8
+    version: 1.0.8(@prisma/client@5.8.1)(prisma@5.8.1)
   source-map-support:
     specifier: ^0.5.21
     version: 0.5.21
@@ -1641,7 +1644,6 @@ packages:
         optional: true
     dependencies:
       prisma: 5.8.1
-    dev: false
 
   /@prisma/debug@5.8.1:
     resolution: {integrity: sha512-tjuw7eA0Us3T42jx9AmAgL58rzwzpFGYc3R7Y4Ip75EBYrKMBA1YihuWMcBC92ILmjlQ/u3p8VxcIE0hr+fZfg==}
@@ -1664,6 +1666,12 @@ packages:
       '@prisma/debug': 5.8.1
       '@prisma/engines-version': 5.8.1-1.78caf6feeaed953168c64e15a249c3e9a033ebe2
       '@prisma/get-platform': 5.8.1
+
+  /@prisma/generator-helper@5.8.1:
+    resolution: {integrity: sha512-2EDd0o+GHfbX1dtw5BnfOz3hQB7AtYrwe4YNiKfo2UDBvB/ne/ChZa3b/vBm/GKpjW2Xaymct8D9oIHev3juzQ==}
+    dependencies:
+      '@prisma/debug': 5.8.1
+    dev: true
 
   /@prisma/get-platform@5.8.1:
     resolution: {integrity: sha512-wnA+6HTFcY+tkykMokix9GiAkaauPC5W/gg0O5JB0J8tCTNWrqpnQ7AsaGRfkYUbeOIioh6woDjQrGTTRf1Zag==}
@@ -5597,6 +5605,18 @@ packages:
       '@jest/schemas': 29.6.3
       ansi-styles: 5.2.0
       react-is: 18.2.0
+    dev: true
+
+  /prisma-markdown@1.0.8(@prisma/client@5.8.1)(prisma@5.8.1):
+    resolution: {integrity: sha512-YoVuTRAhIivEKnB1jLu4Ge9PDDhNqvEnc4B9f56OvEXoJ1pT5Pkvd0d0WvLaAtJL6ooT+IGQSRgVi+CuKktZCA==}
+    hasBin: true
+    peerDependencies:
+      '@prisma/client': '>= 5.0.0'
+      prisma: '>= 5.0.0'
+    dependencies:
+      '@prisma/client': 5.8.1(prisma@5.8.1)
+      '@prisma/generator-helper': 5.8.1
+      prisma: 5.8.1
     dev: true
 
   /prisma@5.8.1:
