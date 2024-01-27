@@ -10,30 +10,174 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator markdown {
+  provider = "prisma-markdown"
+  output   = "./ERD.md"
+  title    = "Estimate System"
+}
+
+/// @namespace EstimateSystem
+enum Country {
+  kr @map("KR")
+  us @map("US")
+  jp @map("JP")
+  cn @map("CN")
+  vn @map("VN")
+}
+
+/// @namespace EstimateSystem
+enum Currency {
+  krw @map("KRW")
+  usd @map("USD")
+  jpy @map("JPY")
+  cny @map("CNY")
+  vnd @map("VND")
+}
+
+/// @namespace EstimateSystem
+enum HardwareType {
+  cpu         @map("CPU")
+  gpu         @map("GPU")
+  ram         @map("RAM")
+  motherboard @map("M/B")
+  disk        @map("DISK")
+  other       @map("OTHER")
+}
+
+/// @namespace EstimateSystem
 model estimate {
-  id         String    @id @db.Uuid
-  name       String?
-  cpu_id     String?   @db.Uuid
-  created_at DateTime  @default(now()) @db.Timestamptz
-  updated_at DateTime  @updatedAt @db.Timestamptz
-  deleted_at DateTime? @db.Timestamptz
-  cpu        cpu?      @relation(fields: [cpu_id], references: [id])
+  id           String         @id @db.Uuid
+  name         String?
+  country      Country
+  created_at   DateTime       @default(now()) @db.Timestamptz
+  updated_at   DateTime       @updatedAt @db.Timestamptz
+  deleted_at   DateTime?      @db.Timestamptz
+  cpu_estimate cpu_estimate[]
+  gpu_estimate gpu_estimate[]
 }
 
+/// @namespace EstimateSystem
+/// @namespace Shop
+/// @namespace CPU
+/// @namespace GPU
+model shop {
+  id                String              @id @db.Uuid
+  name              String
+  country           Country
+  created_at        DateTime            @default(now()) @db.Timestamptz
+  updated_at        DateTime            @updatedAt @db.Timestamptz
+  deleted_at        DateTime?           @db.Timestamptz
+  cpu_estimate      cpu_estimate[]
+  gpu_estimate      gpu_estimate[]
+  cpu_pricing_table cpu_pricing_table[]
+  gpu_pricing_table gpu_pricing_table[]
+}
+
+/// @namespace EstimateSystem
+/// @namespace CPU
+/// @namespace GPU
+model ai_answer {
+  id           String         @id @db.Uuid
+  name         String
+  table_price  Float
+  buying_price Float
+  currency     Currency
+  metadata     String?
+  created_at   DateTime       @default(now()) @db.Timestamptz
+  updated_at   DateTime       @updatedAt @db.Timestamptz
+  deleted_at   DateTime?      @db.Timestamptz
+  cpu_estimate cpu_estimate[]
+  gpu_estimate gpu_estimate[]
+}
+
+/// @namespace EstimateSystem
+/// @namespace CPU
+model cpu_estimate {
+  id           String    @id @db.Uuid
+  cpu_id       String    @db.Uuid
+  estimate_id  String    @db.Uuid
+  shop_id      String    @db.Uuid
+  ai_answer_id String    @db.Uuid
+  created_at   DateTime  @default(now()) @db.Timestamptz
+  updated_at   DateTime  @updatedAt @db.Timestamptz
+  deleted_at   DateTime? @db.Timestamptz
+  cpu          cpu       @relation(fields: [cpu_id], references: [id])
+  estimate     estimate  @relation(fields: [estimate_id], references: [id])
+  shop         shop      @relation(fields: [shop_id], references: [id])
+  ai_answer    ai_answer @relation(fields: [ai_answer_id], references: [id])
+}
+
+/// @namespace EstimateSystem
+/// @namespace CPU
 model cpu {
-  id         String     @id @db.Uuid
-  name       String
-  price      Float
-  created_at DateTime   @default(now()) @db.Timestamptz
-  updated_at DateTime   @updatedAt @db.Timestamptz
-  deleted_at DateTime?  @db.Timestamptz
-  estimate   estimate[]
+  id           String         @id @db.Uuid
+  model_name   String
+  vendor       String
+  core_count   Int
+  thread_count Int?
+  base_clock   Float?
+  boost_clock  Float?
+  metadata     String?
+  created_at   DateTime       @default(now()) @db.Timestamptz
+  updated_at   DateTime       @updatedAt @db.Timestamptz
+  deleted_at   DateTime?      @db.Timestamptz
+  cpu_estimate cpu_estimate[]
 }
 
-model sample_estimate {
+/// @namespace EstimateSystem
+/// @namespace GPU
+model gpu {
+  id           String         @id @db.Uuid
+  model_name   String
+  chipset      String
+  vendor       String
+  sub_vendor   String?
+  metadata     String?
+  created_at   DateTime       @default(now()) @db.Timestamptz
+  updated_at   DateTime       @updatedAt @db.Timestamptz
+  deleted_at   DateTime?      @db.Timestamptz
+  gpu_estimate gpu_estimate[]
+}
+
+/// @namespace EstimateSystem
+/// @namespace GPU
+model gpu_estimate {
+  id           String    @id @db.Uuid
+  gpu_id       String    @db.Uuid
+  estimate_id  String    @db.Uuid
+  shop_id      String    @db.Uuid
+  ai_answer_id String    @db.Uuid
+  created_at   DateTime  @default(now()) @db.Timestamptz
+  updated_at   DateTime  @updatedAt @db.Timestamptz
+  deleted_at   DateTime? @db.Timestamptz
+  gpu          gpu       @relation(fields: [gpu_id], references: [id])
+  estimate     estimate  @relation(fields: [estimate_id], references: [id])
+  shop         shop      @relation(fields: [shop_id], references: [id])
+  ai_answer    ai_answer @relation(fields: [ai_answer_id], references: [id])
+}
+
+/// @namespace EstimateSystem
+/// @namespace CPU
+/// @namespace Shop
+model cpu_pricing_table {
   id         String    @id @db.Uuid
+  shop_id    String    @db.Uuid
   sheets     String
   created_at DateTime  @default(now()) @db.Timestamptz
   updated_at DateTime  @updatedAt @db.Timestamptz
   deleted_at DateTime? @db.Timestamptz
+  shop       shop      @relation(fields: [shop_id], references: [id])
+}
+
+/// @namespace EstimateSystem
+/// @namespace GPU
+/// @namespace Shop
+model gpu_pricing_table {
+  id         String    @id @db.Uuid
+  shop_id    String    @db.Uuid
+  sheets     String
+  created_at DateTime  @default(now()) @db.Timestamptz
+  updated_at DateTime  @updatedAt @db.Timestamptz
+  deleted_at DateTime? @db.Timestamptz
+  shop       shop      @relation(fields: [shop_id], references: [id])
 }
