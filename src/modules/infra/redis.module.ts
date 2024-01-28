@@ -1,10 +1,10 @@
 import { FactoryProvider, Logger, Module } from '@nestjs/common';
 import { Redis } from 'ioredis';
-import { REDIS } from '../constants/redis.constant';
+import { REDIS } from '../../constants/redis.constant';
 import { ConfigService } from '@nestjs/config';
-import { RedisRepository } from '../repositories/redis.repository';
-import { IRedisRepository } from '../interfaces/redis.repository.interface';
-import { RedisService } from '../services/redis.service';
+import { RedisRepository } from '../../repositories/infra/redis.repository';
+import { IRedisRepository } from '../../interfaces/infra/redis.repository.interface';
+import { RedisService } from '../../services/infra/redis.service';
 
 export const redisFactory: FactoryProvider = {
   inject: [ConfigService],

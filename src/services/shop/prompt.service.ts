@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RedisService } from './redis.service';
-import { REDIS_PROMPT_PREFIX } from '../constants/redis.constant';
-import { PromptCacheDto } from '../dtos/estimate/prompt.dto';
+import { RedisService } from '../infra/redis.service';
+import { REDIS_PROMPT_PREFIX } from '../../constants/redis.constant';
+import { PromptCacheDto } from '../../dtos/estimate/prompt.dto';
 
 @Injectable()
 export class PromptService {

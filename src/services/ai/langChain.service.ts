@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { StructuredOutputParser } from 'langchain/output_parsers';
-import { AI_MODEL } from '../constants/ai.constants';
+import { AI_MODEL } from '../../constants/ai.constants';
 import { z } from 'zod';
-import { UnknownException } from '../exceptions/unknown.exception';
+import { UnknownException } from '../../exceptions/unknown.exception';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
 

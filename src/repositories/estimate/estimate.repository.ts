@@ -1,35 +1,32 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { BaseRepository } from './base.repository';
-import { PrismaService } from '../services/prisma.service';
-import {
-  EstimateCreateDto,
-  EstimateDto,
-  EstimateQueryDto,
-  EstimateUpdateDto,
-} from '../dtos/estimate/estimate.dto';
+import { BaseRepository } from '../base.repository';
+import { PrismaService } from '../../services/infra/prisma.service';
+import { EstimateQueryDto } from '../../dtos/estimate/estimate.dto';
 import { estimate } from '@prisma/client';
-import { v4 as uuidV4 } from 'uuid';
+import {
+  IEstimate,
+  IEstimateCreate,
+  IEstimateUpdate,
+} from '../../interfaces/estimate/estimate.interface';
 
 @Injectable()
-export class EstimateRepository extends BaseRepository<estimate, EstimateDto> {
+export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
   private readonly logger = new Logger(EstimateRepository.name);
 
   constructor(private readonly prisma: PrismaService) {
     super();
   }
 
-  protected _transform(estimate: estimate): EstimateDto {
+  protected _transform(estimate: estimate): IEstimate {
     return {
       id: estimate.id,
       name: estimate.name,
-      cpuId: estimate.cpu_id,
-      createdAt: estimate.created_at.toISOString(),
-      updatedAt: estimate.updated_at.toISOString(),
-      deletedAt: estimate.deleted_at?.toISOString(),
+      country: estimate.country,
+      parts: [],
     };
   }
 
-  async findBy(query: EstimateQueryDto): Promise<EstimateDto | null> {
+  async findBy(query: EstimateQueryDto): Promise<IEstimate | null> {
     try {
       const estimate = await this.prisma.estimate.findUniqueOrThrow({
         where: query,
@@ -43,7 +40,7 @@ export class EstimateRepository extends BaseRepository<estimate, EstimateDto> {
     }
   }
 
-  async findMany(): Promise<EstimateDto[]> {
+  async findMany(): Promise<IEstimate[]> {
     try {
       const estimates = await this.prisma.estimate.findMany();
       return estimates.map((estimate) => this._transform(estimate));
@@ -52,13 +49,13 @@ export class EstimateRepository extends BaseRepository<estimate, EstimateDto> {
     }
   }
 
-  async create(dto: EstimateCreateDto): Promise<EstimateDto> {
+  async create(dto: IEstimateCreate): Promise<IEstimate> {
     try {
       const created = await this.prisma.estimate.create({
         data: {
-          id: uuidV4(),
+          id: dto.id,
           name: dto.name,
-          cpu_id: dto.cpuId,
+          country: 'KR',
         },
       });
 
@@ -70,7 +67,7 @@ export class EstimateRepository extends BaseRepository<estimate, EstimateDto> {
     }
   }
 
-  async update(dto: EstimateUpdateDto): Promise<EstimateDto> {
+  async update(dto: IEstimateUpdate): Promise<IEstimate> {
     try {
       const updated = await this.prisma.estimate.update({
         where: { id: dto.id },

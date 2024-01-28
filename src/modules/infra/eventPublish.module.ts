@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { REDIS_PUB } from '../constants/redis.constant';
-import { EventPublishService } from '../services/eventPublish.service';
+import { REDIS_PUB } from '../../constants/redis.constant';
+import { EventPublishService } from '../../services/infra/eventPublish.service';
 
 @Module({
   imports: [

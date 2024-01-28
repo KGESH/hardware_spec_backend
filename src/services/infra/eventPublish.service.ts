@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { REDIS_PUB } from '../constants/redis.constant';
+import { REDIS_PUB } from '../../constants/redis.constant';
 
 @Injectable()
 export class EventPublishService {

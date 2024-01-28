@@ -3,7 +3,7 @@ import {
   IRedisGetArgs,
   IRedisRepository,
   IRedisSetArgs,
-} from '../interfaces/redis.repository.interface';
+} from '../../interfaces/infra/redis.repository.interface';
 
 @Injectable()
 export class RedisService {

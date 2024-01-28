@@ -3,11 +3,11 @@ import {
   IRedisGetArgs,
   IRedisRepository,
   IRedisSetArgs,
-} from '../interfaces/redis.repository.interface';
+} from '../../interfaces/infra/redis.repository.interface';
 import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Redis } from 'ioredis';
-import { REDIS } from '../constants/redis.constant';
-import { UnknownException } from '../exceptions/unknown.exception';
+import { REDIS } from '../../constants/redis.constant';
+import { UnknownException } from '../../exceptions/unknown.exception';
 
 @Injectable()
 export class RedisRepository implements IRedisRepository, OnModuleDestroy {
