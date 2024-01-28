@@ -1,5 +1,6 @@
-import { IHardware } from './hardware.dto';
+import { HardwareDto } from './hardware.dto';
 
-export type GpuDto = IHardware & {
-  subVendorName?: string;
+export type GpuDto = HardwareDto & {
+  chipset: string;
+  subVendorName: string | null;
 };
