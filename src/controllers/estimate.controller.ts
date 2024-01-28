@@ -26,41 +26,40 @@ export class EstimateController {
     private readonly shopService: ShopService,
   ) {}
 
-  @TypedRoute.Get('/:estimateId/:encodedId')
+  @TypedRoute.Get('/:estimateId')
   async getEstimate(
     @TypedParam('estimateId') estimateId: string,
-    @TypedParam('encodedId') encodedId: string,
   ): Promise<ResponseDto<AIEstimateResponseDto>> {
-    this.logger.debug(`EncodedId`, encodedId);
+    this.logger.debug(`getEstimate`);
 
-    const estimate = await this.estimateService.getCachedEstimate({
+    const cachedEstimate = await this.estimateService.getCachedEstimate({
       estimateId,
     });
 
-    this.logger.debug(`Estimate`, estimate);
-
-    if (!estimate) {
-      throw new EntityNotfoundException({
-        message: `Estimate not found`,
-      });
+    if (cachedEstimate) {
+      return {
+        status: 'success',
+        data: cachedEstimate,
+      };
     }
 
-    // Check encodedId, if not match then hardware components are changed.
-    if (estimate.status === 'estimated' && estimate.encodedId !== encodedId) {
-      throw new EntityNotfoundException({
-        message: `Encoded ID not matched. Probably hardware components are changed`,
-      });
-    }
+    const estimate = await this.estimateService.getEstimateWithParts({
+      id: estimateId,
+    });
 
-    if (estimate.status === 'error') {
-      throw new EntityNotfoundException({
-        message: `Estimate created error`,
-      });
-    }
+    if (!estimate)
+      throw new EntityNotfoundException({ message: `Estimate not found` });
+
+    this.logger.verbose(`Transofmred PARTS`, estimate.parts);
 
     return {
       status: 'success',
-      data: estimate,
+      data: {
+        status: 'estimated',
+        shopId: this.shopId,
+        estimateId: estimate.id,
+        estimates: estimate.parts,
+      },
     };
   }
 
@@ -83,33 +82,18 @@ export class EstimateController {
     const aiRequestDto: EstimateRequestDto = {
       shopId: this.shopId, // Todo: replace to real shopId
       estimateId: estimate.id,
-      encodedId,
       computer: computerDto,
     };
 
+    this.logger.verbose(`==========AI Request DTO==========`, aiRequestDto);
+
     await this.estimateService.cacheEstimate({
-      encodedId,
       status: 'draft',
       estimateId: estimate.id,
       shopId: this.shopId,
     });
 
-    // const createdEstimate = await this.estimateService.getCachedEstimate({
-    //   estimateId,
-    // });
-    //
-    // if (createdEstimate?.status === 'success') {
-    //   return {
-    //     status: 'success',
-    //     data: {
-    //       status: 'exist',
-    //       shopId: aiRequestDto.shopId,
-    //       encodedId,
-    //       estimateId,
-    //     },
-    //   };
-    // }
-
+    // Todo: change cache logic. remove encoded Id
     // Request Estimate from AI.
     await this.computerService.cacheComputerSpec(encodedId, computerDto);
     await this.eventService.emit(ESTIMATE_CREATE_EVENT, aiRequestDto);

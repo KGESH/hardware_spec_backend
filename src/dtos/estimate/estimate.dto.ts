@@ -15,13 +15,11 @@ export type EstimateStatusDto =
 export type EstimateCacheDto = {
   shopId: string & tags.Format<'uuid'>;
   estimateId: string & tags.Format<'uuid'>;
-  encodedId: string;
 };
 
 export type EstimateRequestDto = {
   shopId: string & tags.Format<'uuid'>;
   estimateId: string & tags.Format<'uuid'>;
-  encodedId: string;
   computer: ComputerDto;
 };
 
