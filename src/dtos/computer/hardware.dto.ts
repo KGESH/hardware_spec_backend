@@ -1,4 +1,4 @@
-export type HardwareTypeDto = 'CPU' | 'GPU' | 'RAM' | 'M/B' | 'DISK' | 'OTHER';
+export type HardwareTypeDto = 'CPU' | 'GPU' | 'RAM' | 'MB' | 'DISK' | 'OTHER';
 
 export type HardwareDto = {
   hwKey: string;

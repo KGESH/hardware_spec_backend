@@ -1,6 +1,8 @@
 import { HardwareDto } from './hardware.dto';
 
+type DiskKind = 'hdd' | 'ssd';
+
 export type DiskDto = HardwareDto & {
-  kind?: string;
-  totalSpace?: number;
+  kind: DiskKind;
+  totalSpace: number;
 };

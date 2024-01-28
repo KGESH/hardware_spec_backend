@@ -23,8 +23,18 @@ erDiagram
     String id PK
     String estimate_id FK
     String name
-    String address
+    Country country
     String phone_number
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"pickup_address" {
+    String id PK
+    String user_info_id FK
+    String address
+    String adress_detail
+    String zip_code
     DateTime created_at
     DateTime updated_at
     DateTime deleted_at "nullable"
@@ -101,7 +111,7 @@ erDiagram
     String model_name
     String vendor
     DiskKind kind
-    Int total_space
+    BigInt total_space
     String metadata "nullable"
     DateTime created_at
     DateTime updated_at
@@ -198,6 +208,7 @@ erDiagram
     DateTime deleted_at "nullable"
 }
 "user_info" |o--|| "estimate" : estimate
+"pickup_address" |o--|| "user_info" : user_info
 "cpu_estimate" }o--|| "cpu" : cpu
 "cpu_estimate" }o--|| "estimate" : estimate
 "cpu_estimate" }o--|| "shop" : shop
@@ -241,8 +252,20 @@ erDiagram
   - `id`: 
   - `estimate_id`: 
   - `name`: 
-  - `address`: 
+  - `country`: 
   - `phone_number`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+### `pickup_address`
+
+**Properties**
+  - `id`: 
+  - `user_info_id`: 
+  - `address`: 
+  - `adress_detail`: 
+  - `zip_code`: 
   - `created_at`: 
   - `updated_at`: 
   - `deleted_at`: 
@@ -465,7 +488,7 @@ erDiagram
     String id PK
     String estimate_id FK
     String name
-    String address
+    Country country
     String phone_number
     DateTime created_at
     DateTime updated_at
@@ -546,7 +569,7 @@ erDiagram
   - `id`: 
   - `estimate_id`: 
   - `name`: 
-  - `address`: 
+  - `country`: 
   - `phone_number`: 
   - `created_at`: 
   - `updated_at`: 
@@ -629,7 +652,7 @@ erDiagram
     String id PK
     String estimate_id FK
     String name
-    String address
+    Country country
     String phone_number
     DateTime created_at
     DateTime updated_at
@@ -708,7 +731,7 @@ erDiagram
   - `id`: 
   - `estimate_id`: 
   - `name`: 
-  - `address`: 
+  - `country`: 
   - `phone_number`: 
   - `created_at`: 
   - `updated_at`: 
@@ -789,7 +812,7 @@ erDiagram
     String id PK
     String estimate_id FK
     String name
-    String address
+    Country country
     String phone_number
     DateTime created_at
     DateTime updated_at
@@ -867,7 +890,7 @@ erDiagram
   - `id`: 
   - `estimate_id`: 
   - `name`: 
-  - `address`: 
+  - `country`: 
   - `phone_number`: 
   - `created_at`: 
   - `updated_at`: 
@@ -947,7 +970,7 @@ erDiagram
     String id PK
     String estimate_id FK
     String name
-    String address
+    Country country
     String phone_number
     DateTime created_at
     DateTime updated_at
@@ -1024,7 +1047,7 @@ erDiagram
   - `id`: 
   - `estimate_id`: 
   - `name`: 
-  - `address`: 
+  - `country`: 
   - `phone_number`: 
   - `created_at`: 
   - `updated_at`: 
@@ -1103,7 +1126,7 @@ erDiagram
     String id PK
     String estimate_id FK
     String name
-    String address
+    Country country
     String phone_number
     DateTime created_at
     DateTime updated_at
@@ -1134,7 +1157,7 @@ erDiagram
     String model_name
     String vendor
     DiskKind kind
-    Int total_space
+    BigInt total_space
     String metadata "nullable"
     DateTime created_at
     DateTime updated_at
@@ -1182,7 +1205,7 @@ erDiagram
   - `id`: 
   - `estimate_id`: 
   - `name`: 
-  - `address`: 
+  - `country`: 
   - `phone_number`: 
   - `created_at`: 
   - `updated_at`: 

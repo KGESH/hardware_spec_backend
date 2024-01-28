@@ -36,12 +36,12 @@ enum Currency {
 
 /// @namespace EstimateSystem
 enum HardwareType {
-  cpu         @map("CPU")
-  gpu         @map("GPU")
-  ram         @map("RAM")
-  motherboard @map("M/B")
-  disk        @map("DISK")
-  other       @map("OTHER")
+  CPU   @map("CPU")
+  GPU   @map("GPU")
+  RAM   @map("RAM")
+  MB    @map("MB")
+  DISK  @map("DISK")
+  OTHER @map("OTHER")
 }
 
 /// @namespace EstimateSystem
@@ -56,8 +56,8 @@ enum EstimateStatus {
 }
 
 enum DiskKind {
-  ssd @map("SSD")
-  hdd @map("HDD")
+  ssd @map("ssd")
+  hdd @map("hdd")
 }
 
 /// @namespace EstimateSystem
@@ -91,18 +91,32 @@ model estimate {
 /// @namespace RAM
 /// @namespace DISK
 model user_info {
-  id           String    @id @db.Uuid
-  estimate_id  String    @unique @db.Uuid
-  name         String
-  address      String
-  phone_number String
-  estimate     estimate  @relation(fields: [estimate_id], references: [id], onDelete: Cascade)
-  created_at   DateTime  @default(now()) @db.Timestamptz
-  updated_at   DateTime  @updatedAt @db.Timestamptz
-  deleted_at   DateTime? @db.Timestamptz
+  id             String          @id @db.Uuid
+  estimate_id    String          @unique @db.Uuid
+  name           String
+  country        Country
+  phone_number   String
+  created_at     DateTime        @default(now()) @db.Timestamptz
+  updated_at     DateTime        @updatedAt @db.Timestamptz
+  deleted_at     DateTime?       @db.Timestamptz
+  estimate       estimate        @relation(fields: [estimate_id], references: [id], onDelete: Cascade)
+  pickup_address pickup_address?
 
   @@index([phone_number])
   @@index([created_at])
+}
+
+/// @namespace EstimateSystem
+model pickup_address {
+  id            String    @id @db.Uuid
+  user_info_id  String    @unique @db.Uuid
+  address       String
+  adress_detail String
+  zip_code      String
+  created_at    DateTime  @default(now()) @db.Timestamptz
+  updated_at    DateTime  @updatedAt @db.Timestamptz
+  deleted_at    DateTime? @db.Timestamptz
+  user_info     user_info @relation(fields: [user_info_id], references: [id], onDelete: Cascade)
 }
 
 /// @namespace EstimateSystem
@@ -236,7 +250,7 @@ model disk {
   model_name    String
   vendor        String
   kind          DiskKind
-  total_space   Int
+  total_space   BigInt
   metadata      String?
   created_at    DateTime        @default(now()) @db.Timestamptz
   updated_at    DateTime        @updatedAt @db.Timestamptz

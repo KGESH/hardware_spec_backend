@@ -1,6 +1,6 @@
 import { tags } from 'typia';
 
-export type IHardwareType = 'CPU' | 'GPU' | 'RAM' | 'M/B' | 'DISK' | 'OTHER';
+export type IHardwareType = 'CPU' | 'GPU' | 'RAM' | 'MB' | 'DISK' | 'OTHER';
 
 export type IHardware = {
   id: string & tags.Format<'uuid'>;

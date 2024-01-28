@@ -22,7 +22,7 @@ export class DiskRepository extends BaseRepository<disk, IDisk> {
       id: entity.id,
       type: 'DISK',
       kind: entity.kind,
-      totalSpace: entity.total_space,
+      totalSpace: Number(entity.total_space),
       hwKey: entity.hw_key,
       displayName: entity.model_name, // Todo: check display name
       vendorName: entity.vendor,
@@ -45,6 +45,8 @@ export class DiskRepository extends BaseRepository<disk, IDisk> {
 
   async create(dto: IDiskCreate): Promise<IDisk> {
     try {
+      this.logger.verbose('========CREATE DISK========');
+      this.logger.verbose(dto);
       const disk = await this.prisma.disk.create({
         data: {
           id: uuidV4(),
