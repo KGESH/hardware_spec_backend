@@ -8,6 +8,7 @@ import {
   IEstimateQuery,
   IEstimateUpdate,
 } from '../../interfaces/estimate/estimate.interface';
+import { v4 as uuidV4 } from 'uuid';
 
 @Injectable()
 export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
@@ -20,23 +21,25 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
   protected _transform(estimate: estimate): IEstimate {
     return {
       id: estimate.id,
+      status: estimate.status,
       name: estimate.name,
-      country: estimate.country,
       parts: [],
     };
   }
 
-  async findBy(query: IEstimateQuery): Promise<IEstimate | null> {
+  async findBy({ id }: IEstimateQuery): Promise<IEstimate | null> {
     try {
+      this.logger.verbose(`[Repository ]Find By`, id);
       const estimate = await this.prisma.estimate.findUniqueOrThrow({
-        where: query,
+        where: { id },
       });
 
       this.logger.debug(estimate);
 
       return this._transform(estimate);
     } catch (e) {
-      return this._handlePrismaNotFoundError(e, `Estimate not found.`);
+      this.logger.verbose(`[Repository ]Find By`, e);
+      return this._handlePrismaNotFoundError(e, `Estimate not found!!.`);
     }
   }
 
@@ -53,9 +56,9 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
     try {
       const created = await this.prisma.estimate.create({
         data: {
-          id: dto.id,
+          id: uuidV4(),
+          status: dto.status,
           name: dto.name,
-          country: 'KR',
         },
       });
 

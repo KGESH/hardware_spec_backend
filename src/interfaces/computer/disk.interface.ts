@@ -1,8 +1,10 @@
 import { IHardware } from './hardware.interface';
 import { IAIEstimate } from '../ai/aiAnswer.interface';
 
+export type IDiskKind = 'hdd' | 'ssd';
+
 export type IDisk = IHardware & {
-  kind: string;
+  kind: IDiskKind;
   totalSpace: number;
 };
 

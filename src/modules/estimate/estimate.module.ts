@@ -18,6 +18,7 @@ import { GpuEstimateRepository } from '../../repositories/estimate/gpuEstimate.r
 import { MotherboardEstimateRepository } from '../../repositories/estimate/motherboardEstimate.repository';
 import { RamEstimateRepository } from '../../repositories/estimate/ramEstimate.repository';
 import { DiskEstimateRepository } from '../../repositories/estimate/diskEstimate.repository';
+import { ShopModule } from '../shop/shop.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { DiskEstimateRepository } from '../../repositories/estimate/diskEstimate
     EventPublishModule,
     ComputerModule,
     AIModule,
+    ShopModule,
   ],
   controllers: [EstimateController],
   providers: [

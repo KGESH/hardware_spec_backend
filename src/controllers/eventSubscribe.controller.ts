@@ -1,6 +1,10 @@
 import { Controller, Logger } from '@nestjs/common';
 import { EventPattern, Payload, Transport } from '@nestjs/microservices';
-import { EstimateRequestDto } from '../dtos/estimate/estimate.dto';
+import {
+  AIEstimatedDto,
+  AIEstimateErrorDto,
+  EstimateRequestDto,
+} from '../dtos/estimate/estimate.dto';
 import { EstimateAIService } from '../services/estimate/estimateAI.service';
 import { ESTIMATE_CREATE_EVENT } from '../constants/estimate.constant';
 import { ComputerService } from '../services/computer/computer.service';
@@ -8,7 +12,6 @@ import { ShopService } from '../services/shop/shop.service';
 import { EntityNotfoundException } from '../exceptions/entityNotfound.exception';
 import { getCurrency } from '../utils/currency';
 import { EstimateService } from '../services/estimate/estimate.service';
-import { AIEstimateResponseDto } from '../dtos/estimate/ai.dto';
 
 @Controller()
 export class EventSubscribeController {
@@ -24,73 +27,53 @@ export class EventSubscribeController {
   @EventPattern(ESTIMATE_CREATE_EVENT, Transport.REDIS)
   async requestEstimate(@Payload() data: EstimateRequestDto): Promise<any> {
     this.logger.debug('EventPattern EXTERNAL API REQUEST START', data);
+    const { shopId, estimateId, encodedId } = data;
 
     const computer = await this.computerService.getComputer(data.computer);
 
-    const shop = await this.shopService.findBy({
-      id: data.shopId,
-    });
+    const shop = await this.shopService.findBy({ id: shopId });
 
-    if (!shop) {
-      throw new EntityNotfoundException({
-        message: `Shop not found`,
-      });
-    }
-
-    // Cache estimate create status
-    await this.estimateAIService.cacheEstimateStatus(
-      {
-        estimateId: data.estimateId,
-      },
-      {
-        status: 'pending',
-        shopId: data.shopId,
-        encodedId: data.encodedId,
-        estimateId: data.estimateId,
-      },
-    );
-
-    const estimate = await this.estimateService.createEstimate({
-      id: data.estimateId,
-      name: 'Estimate',
-      country: shop.country,
-    });
+    if (!shop) throw new EntityNotfoundException({ message: `Shop not found` });
 
     // Todo: make dto
     const estimateParts = await this.estimateAIService.requestEstimate({
+      shopId,
       computer,
+      estimateId,
       currency: getCurrency(shop.country),
-      shopId: shop.id,
-      estimateId: estimate.id,
     });
 
-    const response: AIEstimateResponseDto =
-      estimateParts.length === 0
-        ? {
-            status: 'error',
-            message: 'Estimate not created',
-            shopId: shop.id,
-            estimateId: estimate.id,
-            encodedId: data.encodedId,
-          }
-        : {
-            status: 'success',
-            shopId: shop.id,
-            estimateId: estimate.id,
-            encodedId: data.encodedId,
-            estimates: estimateParts,
-          };
+    // Estimate Creation failed
+    if (estimateParts.length === 0) {
+      const errorResponse: AIEstimateErrorDto = {
+        status: 'error',
+        message: 'Estimate not created',
+        shopId,
+        estimateId,
+        encodedId,
+      };
+      await this.estimateService.updateEstimate({
+        id: estimateId,
+        status: 'error',
+      });
+      await this.estimateAIService.cacheEstimateStatus(errorResponse);
+      this.logger.debug('Estimate Creation failed', errorResponse);
+      return errorResponse;
+    }
 
-    // Cache created estimate
-    await this.estimateAIService.cacheEstimateStatus(
-      {
-        estimateId: data.estimateId,
-      },
-      response,
-    );
-
-    this.logger.debug('EventPattern EXTERNAL API REQUEST DONE', response);
-
-    return { message: 'DONE' };
+    const successResponse: AIEstimatedDto = {
+      status: 'estimated',
+      shopId,
+      estimateId,
+      encodedId,
+      estimates: estimateParts,
+    };
+    await this.estimateService.updateEstimate({
+      id: estimateId,
+      status: 'estimated',
+    });
+    await this.estimateAIService.cacheEstimateStatus(successResponse);
+    this.logger.debug('Estimate Creation success', successResponse);
+    return successResponse;
   }
 }

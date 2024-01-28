@@ -2,17 +2,20 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EstimateRepository } from '../../repositories/estimate/estimate.repository';
 import { RedisService } from '../infra/redis.service';
 import { REDIS_ESTIMATE_PREFIX } from '../../constants/redis.constant';
-import { AIEstimateResponseDto } from '../../dtos/estimate/ai.dto';
 import {
   IEstimate,
   IEstimateCacheQuery,
   IEstimateCreate,
+  IEstimateQuery,
+  IEstimateUpdate,
 } from '../../interfaces/estimate/estimate.interface';
 import {
   IPartEstimate,
   IPartEstimateCreate,
 } from '../../interfaces/estimate/part.interface';
 import { EstimatePartService } from './estimatePart.service';
+import { EntityNotfoundException } from '../../exceptions/entityNotfound.exception';
+import { AIEstimateResponseDto } from '../../dtos/estimate/estimate.dto';
 
 @Injectable()
 export class EstimateService {
@@ -32,14 +35,17 @@ export class EstimateService {
     return await this.estimateRepository.create(dto);
   }
 
+  async findBy(query: IEstimateQuery): Promise<IEstimate | null> {
+    return await this.estimateRepository.findBy(query);
+  }
+
   async cacheEstimate(
-    { estimateId }: IEstimateCacheQuery,
     estimateDto: AIEstimateResponseDto,
     expiry?: number,
   ): Promise<boolean> {
     return await this.redisService.setSerialize({
       prefix: REDIS_ESTIMATE_PREFIX('shopId'),
-      key: estimateId,
+      key: estimateDto.estimateId,
       value: estimateDto,
       expiry,
     });
@@ -58,6 +64,16 @@ export class EstimateService {
     dto: Omit<IPartEstimate, 'aiAnswer'>,
   ): Promise<IPartEstimate | null> {
     return this.estimatePartService.getCachedEstimatePart(dto);
+  }
+
+  async updateEstimate(dto: IEstimateUpdate): Promise<IEstimate> {
+    this.logger.verbose(`Update estimate`, dto);
+    const found = await this.findBy(dto);
+
+    if (!found)
+      throw new EntityNotfoundException({ message: 'Estimate not found.' });
+
+    return await this.estimateRepository.update(dto);
   }
 
   decodeEstimateId(estimateId: string): string {

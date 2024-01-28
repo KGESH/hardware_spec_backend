@@ -1,1 +1,1 @@
-export type IOs = {};
+export type IOs = { name: string };

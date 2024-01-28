@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { LangChainService } from '../ai/langChain.service';
 import { AI_SAMPLE_COMPUTER_PROMPT } from '../../constants/ai.constants';
-import { AIEstimateResponseDto } from '../../dtos/estimate/ai.dto';
 import { aiAnswerSchema } from '../../schemas/langchain.schema';
 import { EstimateService } from './estimate.service';
 import { HardwareDto } from '../../dtos/computer/hardware.dto';
@@ -13,13 +12,13 @@ import { DiskDto } from '../../dtos/computer/disk.dto';
 import { UnknownException } from '../../exceptions/unknown.exception';
 import { IComputer } from '../../interfaces/computer/computer.interface';
 import { IHardware } from '../../interfaces/computer/hardware.interface';
-import { IEstimateCacheQuery } from '../../interfaces/estimate/estimate.interface';
 import {
   IPartEstimate,
   IPartEstimateCreate,
 } from '../../interfaces/estimate/part.interface';
 import { IAIResponse } from '../../interfaces/ai/aiAnswer.interface';
 import { ICurrency } from '../../interfaces/common.interface';
+import { AIEstimateResponseDto } from '../../dtos/estimate/estimate.dto';
 
 @Injectable()
 export class EstimateAIService {
@@ -30,12 +29,9 @@ export class EstimateAIService {
     private readonly estimateService: EstimateService,
   ) {}
 
-  async cacheEstimateStatus(
-    cacheQuery: IEstimateCacheQuery,
-    response: AIEstimateResponseDto,
-  ) {
+  async cacheEstimateStatus(response: AIEstimateResponseDto) {
     // Cache created status
-    await this.estimateService.cacheEstimate(cacheQuery, response);
+    await this.estimateService.cacheEstimate(response);
   }
 
   async requestEstimate({
@@ -105,7 +101,6 @@ export class EstimateAIService {
         query,
       })
       .then((aiAnswer) => {
-        // // Todo: save estimate part to database
         return this.estimateService.saveEstimatePart({
           shopId,
           hardware,
@@ -113,12 +108,6 @@ export class EstimateAIService {
           estimateId,
           aiResponse: aiAnswer,
         });
-
-        // return {
-        //   shopId,
-        //   hardware,
-        //   estimate: { ...aiAnswer },
-        // };
       });
   }
 
