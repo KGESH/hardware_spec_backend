@@ -64,8 +64,6 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
   }
 
   private _transformWithParts(estimate: EstimateWithParts): IEstimate {
-    // const estimateWithParts = isPartExists.data;
-    this.logger.verbose(`[_transform] isPartExists Success`, estimate);
     return {
       id: estimate.id,
       status: estimate.status,
@@ -177,7 +175,6 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
 
   async findBy({ id }: IEstimateQuery): Promise<IEstimate | null> {
     try {
-      this.logger.verbose(`[Repository ]Find By`, id);
       const estimate = await this.prisma.estimate.findUniqueOrThrow({
         where: { id },
       });
@@ -186,14 +183,12 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
 
       return this._transform(estimate);
     } catch (e) {
-      this.logger.verbose(`[Repository ]Find By`, e);
-      return this._handlePrismaNotFoundError(e, `Estimate not found!!.`);
+      return this._handlePrismaNotFoundError(e, `Estimate not found.`);
     }
   }
 
   async findWithParts({ id }: IEstimateQuery): Promise<IEstimate | null> {
     try {
-      this.logger.verbose(`[Repository ]Find By`, id);
       const estimate = await this.prisma.estimate.findUniqueOrThrow({
         where: { id },
         include: {
@@ -234,8 +229,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
 
       return this._transformWithParts(estimate);
     } catch (e) {
-      this.logger.verbose(`[Repository ]Find By`, e);
-      return this._handlePrismaNotFoundError(e, `Estimate not found!!.`);
+      return this._handlePrismaNotFoundError(e, `Estimate not found.`);
     }
   }
 
