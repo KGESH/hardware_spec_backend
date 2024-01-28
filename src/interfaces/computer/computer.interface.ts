@@ -10,6 +10,6 @@ export type IComputer = {
   cpu?: ICpu;
   motherboard?: IMotherboard;
   gpu?: IGpu;
-  rams?: IRam[];
-  disks?: IDisk[];
+  rams: IRam[];
+  disks: IDisk[];
 };
