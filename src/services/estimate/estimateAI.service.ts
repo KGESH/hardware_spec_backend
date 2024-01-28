@@ -129,7 +129,7 @@ export class EstimateAIService {
           gpu?.subVendorName ? ` / ${gpu.subVendorName}` : '',
         );
 
-      case 'M/B':
+      case 'MB':
         const motherboard = hardware as MotherboardDto;
         return `${motherboard.displayName}`
           .concat(motherboard?.vendorName ? ` / ${motherboard.vendorName}` : '')
