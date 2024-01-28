@@ -1,15 +1,22 @@
 import { z } from 'zod';
 import { aiAnswerSchema } from '../../schemas/langchain.schema';
 import { tags } from 'typia';
-import { IHardware } from '../computer/hardware.dto';
+import { HardwareDto } from '../computer/hardware.dto';
+import { ICurrency } from './currency.dto';
 import { EstimateCacheDto } from './estimate.dto';
 
 export type AIEstimateAnswerDto = z.infer<typeof aiAnswerSchema>;
 
+export type AIAnswerDto = AIEstimateAnswerDto & {
+  id: string & tags.Format<'uuid'>;
+  currency: ICurrency;
+  metadata: string | null;
+};
+
 export type AIEstimatePartDto = {
   shopId: string & tags.Format<'uuid'>;
-  hardware: IHardware;
-  estimate: AIEstimateAnswerDto;
+  hardware: HardwareDto;
+  aiAnswer: AIAnswerDto;
 };
 
 export type AIEstimatePendingDto = EstimateCacheDto & {

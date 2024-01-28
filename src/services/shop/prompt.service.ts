@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RedisService } from '../infra/redis.service';
 import { REDIS_PROMPT_PREFIX } from '../../constants/redis.constant';
-import { PromptCacheDto } from '../../dtos/estimate/prompt.dto';
+import { IPromptCache } from '../../interfaces/ai/prompt.interface';
 
 @Injectable()
 export class PromptService {
@@ -9,7 +9,7 @@ export class PromptService {
 
   constructor(private readonly redisService: RedisService) {}
 
-  async cachePrompt({ shopId, prompt }: PromptCacheDto): Promise<boolean> {
+  async cachePrompt({ shopId, prompt }: IPromptCache): Promise<boolean> {
     return this.redisService.set({
       prefix: REDIS_PROMPT_PREFIX,
       key: shopId,
