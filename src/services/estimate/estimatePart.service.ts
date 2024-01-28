@@ -62,7 +62,7 @@ export class EstimatePartService {
           aiAnswer: gpuEstimate.aiAnswer,
         };
 
-      case 'M/B':
+      case 'MB':
         const motherboardEstimate =
           await this.motherboardEstimateService.createEstimate(dto);
         await this.cacheEstimatePart({
