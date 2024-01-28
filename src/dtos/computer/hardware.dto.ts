@@ -1,7 +1,8 @@
-export type IHardwareType = 'CPU' | 'GPU' | 'RAM' | 'M/B' | 'DISK' | 'Other';
+export type HardwareTypeDto = 'CPU' | 'GPU' | 'RAM' | 'M/B' | 'DISK' | 'OTHER';
 
-export type IHardware = {
+export type HardwareDto = {
+  hwKey: string;
   vendorName: string;
   displayName: string;
-  type: IHardwareType;
+  type: HardwareTypeDto;
 };

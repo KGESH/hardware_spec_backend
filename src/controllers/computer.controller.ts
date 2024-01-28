@@ -2,7 +2,7 @@ import { Controller, Logger } from '@nestjs/common';
 import { TypedParam, TypedRoute } from '@nestia/core';
 import { ResponseDto } from '../dtos/response/response.dto';
 import { SystemInfoDto } from '../dtos/computer/computer.dto';
-import { ComputerService } from '../services/computer.service';
+import { ComputerService } from '../services/computer/computer.service';
 import { EntityNotfoundException } from '../exceptions/entityNotfound.exception';
 
 @Controller('computer')
