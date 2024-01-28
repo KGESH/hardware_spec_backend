@@ -27,7 +27,7 @@ export class EventSubscribeController {
   @EventPattern(ESTIMATE_CREATE_EVENT, Transport.REDIS)
   async requestEstimate(@Payload() data: EstimateRequestDto): Promise<any> {
     this.logger.debug('EventPattern EXTERNAL API REQUEST START', data);
-    const { shopId, estimateId, encodedId } = data;
+    const { shopId, estimateId } = data;
 
     const computer = await this.computerService.getComputer(data.computer);
 
@@ -50,7 +50,6 @@ export class EventSubscribeController {
         message: 'Estimate not created',
         shopId,
         estimateId,
-        encodedId,
       };
       await this.estimateService.updateEstimate({
         id: estimateId,
@@ -65,7 +64,6 @@ export class EventSubscribeController {
       status: 'estimated',
       shopId,
       estimateId,
-      encodedId,
       estimates: estimateParts,
     };
     await this.estimateService.updateEstimate({
