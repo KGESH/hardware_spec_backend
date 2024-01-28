@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { BaseRepository } from '../base.repository';
 import { PrismaService } from '../../services/infra/prisma.service';
-import { EstimateQueryDto } from '../../dtos/estimate/estimate.dto';
 import { estimate } from '@prisma/client';
 import {
   IEstimate,
   IEstimateCreate,
+  IEstimateQuery,
   IEstimateUpdate,
 } from '../../interfaces/estimate/estimate.interface';
 
@@ -26,7 +26,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
     };
   }
 
-  async findBy(query: EstimateQueryDto): Promise<IEstimate | null> {
+  async findBy(query: IEstimateQuery): Promise<IEstimate | null> {
     try {
       const estimate = await this.prisma.estimate.findUniqueOrThrow({
         where: query,

@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { EstimateModule } from './modules/estimate.module';
-import { RedisModule } from './modules/redis.module';
-import { EventSubscribeModule } from './modules/eventSubscribe.module';
+import { EstimateModule } from './modules/estimate/estimate.module';
+import { RedisModule } from './modules/infra/redis.module';
+import { EventSubscribeModule } from './modules/infra/eventSubscribe.module';
+import { ShopModule } from './modules/shop/shop.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { EventSubscribeModule } from './modules/eventSubscribe.module';
     RedisModule,
     EstimateModule,
     EventSubscribeModule,
+    ShopModule,
   ],
   controllers: [AppController],
   providers: [AppService],

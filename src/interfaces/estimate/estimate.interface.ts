@@ -9,6 +9,8 @@ export type IEstimate = {
   parts: IPartEstimate[];
 };
 
+export type IEstimateQuery = Pick<IEstimate, 'id'>;
+
 export type IEstimateCacheQuery = {
   estimateId: string & tags.Format<'uuid'>;
 };

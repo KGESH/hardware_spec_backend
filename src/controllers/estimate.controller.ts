@@ -2,22 +2,21 @@ import { Controller, Logger } from '@nestjs/common';
 import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
 import { ResponseDto } from '../dtos/response/response.dto';
 import { ComputerDto } from '../dtos/computer/computer.dto';
-import { EventPublishService } from '../services/eventPublish.service';
-import { EstimateService } from '../services/estimate.service';
+import { EventPublishService } from '../services/infra/eventPublish.service';
+import { EstimateService } from '../services/estimate/estimate.service';
 import {
   EstimateCreateResponseDto,
   EstimateRequestDto,
 } from '../dtos/estimate/estimate.dto';
-import { ComputerService } from '../services/computer.service';
+import { ComputerService } from '../services/computer/computer.service';
 import { AIEstimateResponseDto } from '../dtos/estimate/ai.dto';
 import { EntityNotfoundException } from '../exceptions/entityNotfound.exception';
 import { ESTIMATE_CREATE_EVENT } from '../constants/estimate.constant';
-import { v4 as uuidV4 } from 'uuid';
 
 @Controller('estimate')
 export class EstimateController {
   private readonly logger = new Logger(EstimateController.name);
-  private readonly shopId = uuidV4(); // Todo: replace to real shopId
+  private readonly shopId = '9697cab6-2276-49bf-a123-acde93a46aa6'; // Todo: replace to real shopId
 
   constructor(
     private readonly estimateService: EstimateService,
@@ -33,7 +32,6 @@ export class EstimateController {
     this.logger.debug(`EncodedId`, encodedId);
 
     const estimate = await this.estimateService.getCachedEstimate({
-      shopId: this.shopId,
       estimateId,
     });
 
@@ -81,7 +79,6 @@ export class EstimateController {
 
     const createdEstimate = await this.estimateService.getCachedEstimate({
       estimateId,
-      shopId: aiRequestDto.shopId,
     });
 
     if (createdEstimate?.status === 'success') {
