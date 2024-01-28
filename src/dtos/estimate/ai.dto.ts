@@ -2,14 +2,14 @@ import { z } from 'zod';
 import { aiAnswerSchema } from '../../schemas/langchain.schema';
 import { tags } from 'typia';
 import { HardwareDto } from '../computer/hardware.dto';
-import { ICurrency } from './currency.dto';
 import { EstimateCacheDto } from './estimate.dto';
+import { CurrencyDto } from '../common.dto';
 
 export type AIEstimateAnswerDto = z.infer<typeof aiAnswerSchema>;
 
 export type AIAnswerDto = AIEstimateAnswerDto & {
   id: string & tags.Format<'uuid'>;
-  currency: ICurrency;
+  currency: CurrencyDto;
   metadata: string | null;
 };
 

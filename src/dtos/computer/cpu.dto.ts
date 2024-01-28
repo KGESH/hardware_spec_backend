@@ -6,7 +6,3 @@ export type CpuDto = HardwareDto & {
   baseClock: number | null;
   boostClock: number | null;
 };
-
-export type CpuCreateDto = Omit<CpuDto, 'type'>;
-
-export type CpuQueryDto = Pick<CpuDto, 'hwKey'>;

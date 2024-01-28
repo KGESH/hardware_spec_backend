@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { aiAnswerSchema } from '../../schemas/langchain.schema';
 import { tags } from 'typia';
-import { ICurrency } from '../../dtos/estimate/currency.dto';
+import { ICurrency } from '../common.interface';
 
 export type IAIResponse = z.infer<typeof aiAnswerSchema>;
 
