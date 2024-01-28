@@ -39,6 +39,10 @@ export class EstimateService {
     return await this.estimateRepository.findBy(query);
   }
 
+  async getEstimateWithParts(query: IEstimateQuery): Promise<IEstimate | null> {
+    return await this.estimateRepository.findWithParts(query);
+  }
+
   async cacheEstimate(
     estimateDto: AIEstimateResponseDto,
     expiry?: number,
