@@ -18,20 +18,20 @@ generator markdown {
 
 /// @namespace EstimateSystem
 enum Country {
-  kr @map("KR")
-  us @map("US")
-  jp @map("JP")
-  cn @map("CN")
-  vn @map("VN")
+  KR @map("KR")
+  US @map("US")
+  JP @map("JP")
+  CN @map("CN")
+  VN @map("VN")
 }
 
 /// @namespace EstimateSystem
 enum Currency {
-  krw @map("KRW")
-  usd @map("USD")
-  jpy @map("JPY")
-  cny @map("CNY")
-  vnd @map("VND")
+  KRW @map("KRW")
+  USD @map("USD")
+  JPY @map("JPY")
+  CNY @map("CNY")
+  VND @map("VND")
 }
 
 /// @namespace EstimateSystem
@@ -46,14 +46,17 @@ enum HardwareType {
 
 /// @namespace EstimateSystem
 model estimate {
-  id           String         @id @db.Uuid
-  name         String?
-  country      Country
-  created_at   DateTime       @default(now()) @db.Timestamptz
-  updated_at   DateTime       @updatedAt @db.Timestamptz
-  deleted_at   DateTime?      @db.Timestamptz
-  cpu_estimate cpu_estimate[]
-  gpu_estimate gpu_estimate[]
+  id                   String                 @id @db.Uuid
+  name                 String
+  country              Country
+  created_at           DateTime               @default(now()) @db.Timestamptz
+  updated_at           DateTime               @updatedAt @db.Timestamptz
+  deleted_at           DateTime?              @db.Timestamptz
+  cpu_estimate         cpu_estimate[]
+  gpu_estimate         gpu_estimate[]
+  ram_estimate         ram_estimate[]
+  disk_estimate        disk_estimate[]
+  motherboard_estimate motherboard_estimate[]
 }
 
 /// @namespace EstimateSystem
@@ -61,33 +64,39 @@ model estimate {
 /// @namespace CPU
 /// @namespace GPU
 model shop {
-  id                String              @id @db.Uuid
-  name              String
-  country           Country
-  created_at        DateTime            @default(now()) @db.Timestamptz
-  updated_at        DateTime            @updatedAt @db.Timestamptz
-  deleted_at        DateTime?           @db.Timestamptz
-  cpu_estimate      cpu_estimate[]
-  gpu_estimate      gpu_estimate[]
-  cpu_pricing_table cpu_pricing_table[]
-  gpu_pricing_table gpu_pricing_table[]
+  id                   String                 @id @db.Uuid
+  name                 String                 @unique
+  country              Country
+  created_at           DateTime               @default(now()) @db.Timestamptz
+  updated_at           DateTime               @updatedAt @db.Timestamptz
+  deleted_at           DateTime?              @db.Timestamptz
+  cpu_estimate         cpu_estimate[]
+  gpu_estimate         gpu_estimate[]
+  cpu_pricing_table    cpu_pricing_table[]
+  gpu_pricing_table    gpu_pricing_table[]
+  motherboard_estimate motherboard_estimate[]
+  ram_estimate         ram_estimate[]
+  disk_estimate        disk_estimate[]
 }
 
 /// @namespace EstimateSystem
 /// @namespace CPU
 /// @namespace GPU
 model ai_answer {
-  id           String         @id @db.Uuid
-  name         String
-  table_price  Float
-  buying_price Float
-  currency     Currency
-  metadata     String?
-  created_at   DateTime       @default(now()) @db.Timestamptz
-  updated_at   DateTime       @updatedAt @db.Timestamptz
-  deleted_at   DateTime?      @db.Timestamptz
-  cpu_estimate cpu_estimate[]
-  gpu_estimate gpu_estimate[]
+  id                   String                 @id @db.Uuid
+  name                 String
+  table_price          Float
+  buying_price         Float
+  currency             Currency
+  metadata             String?
+  created_at           DateTime               @default(now()) @db.Timestamptz
+  updated_at           DateTime               @updatedAt @db.Timestamptz
+  deleted_at           DateTime?              @db.Timestamptz
+  cpu_estimate         cpu_estimate[]
+  gpu_estimate         gpu_estimate[]
+  motherboard_estimate motherboard_estimate[]
+  ram_estimate         ram_estimate[]
+  disk_estimate        disk_estimate[]
 }
 
 /// @namespace EstimateSystem
@@ -111,6 +120,7 @@ model cpu_estimate {
 /// @namespace CPU
 model cpu {
   id           String         @id @db.Uuid
+  hw_key       String         @unique
   model_name   String
   vendor       String
   core_count   Int
@@ -128,6 +138,7 @@ model cpu {
 /// @namespace GPU
 model gpu {
   id           String         @id @db.Uuid
+  hw_key       String         @unique
   model_name   String
   chipset      String
   vendor       String
@@ -137,6 +148,68 @@ model gpu {
   updated_at   DateTime       @updatedAt @db.Timestamptz
   deleted_at   DateTime?      @db.Timestamptz
   gpu_estimate gpu_estimate[]
+}
+
+/// @namespace EstimateSystem
+/// @namespace MotherBoard
+model motherboard {
+  id                   String                 @id @db.Uuid
+  hw_key               String                 @unique
+  model_name           String
+  vendor               String
+  chipset              String
+  metadata             String?
+  created_at           DateTime               @default(now()) @db.Timestamptz
+  updated_at           DateTime               @updatedAt @db.Timestamptz
+  deleted_at           DateTime?              @db.Timestamptz
+  motherboard_estimate motherboard_estimate[]
+}
+
+/// @namespace EstimateSystem
+/// @namespace RAM
+model ram {
+  id           String         @id @db.Uuid
+  hw_key       String         @unique
+  model_name   String
+  vendor       String
+  metadata     String?
+  created_at   DateTime       @default(now()) @db.Timestamptz
+  updated_at   DateTime       @updatedAt @db.Timestamptz
+  deleted_at   DateTime?      @db.Timestamptz
+  ram_estimate ram_estimate[]
+}
+
+/// @namespace EstimateSystem
+/// @namespace DISK
+model disk {
+  id            String          @id @db.Uuid
+  hw_key        String          @unique
+  model_name    String
+  vendor        String
+  kind          String
+  total_space   Int
+  metadata      String?
+  created_at    DateTime        @default(now()) @db.Timestamptz
+  updated_at    DateTime        @updatedAt @db.Timestamptz
+  deleted_at    DateTime?       @db.Timestamptz
+  disk_estimate disk_estimate[]
+}
+
+/// @namespace EstimateSystem
+/// @namespace MotherBoard
+model motherboard_estimate {
+  id             String      @id @db.Uuid
+  motherboard_id String      @db.Uuid
+  estimate_id    String      @db.Uuid
+  shop_id        String      @db.Uuid
+  ai_answer_id   String      @db.Uuid
+  created_at     DateTime    @default(now()) @db.Timestamptz
+  updated_at     DateTime    @updatedAt @db.Timestamptz
+  deleted_at     DateTime?   @db.Timestamptz
+  motherboard    motherboard @relation(fields: [motherboard_id], references: [id])
+  estimate       estimate    @relation(fields: [estimate_id], references: [id])
+  shop           shop        @relation(fields: [shop_id], references: [id])
+  ai_answer      ai_answer   @relation(fields: [ai_answer_id], references: [id])
 }
 
 /// @namespace EstimateSystem
@@ -151,6 +224,40 @@ model gpu_estimate {
   updated_at   DateTime  @updatedAt @db.Timestamptz
   deleted_at   DateTime? @db.Timestamptz
   gpu          gpu       @relation(fields: [gpu_id], references: [id])
+  estimate     estimate  @relation(fields: [estimate_id], references: [id])
+  shop         shop      @relation(fields: [shop_id], references: [id])
+  ai_answer    ai_answer @relation(fields: [ai_answer_id], references: [id])
+}
+
+/// @namespace EstimateSystem
+/// @namespace RAM
+model ram_estimate {
+  id           String    @id @db.Uuid
+  ram_id       String    @db.Uuid
+  estimate_id  String    @db.Uuid
+  shop_id      String    @db.Uuid
+  ai_answer_id String    @db.Uuid
+  created_at   DateTime  @default(now()) @db.Timestamptz
+  updated_at   DateTime  @updatedAt @db.Timestamptz
+  deleted_at   DateTime? @db.Timestamptz
+  ram          ram       @relation(fields: [ram_id], references: [id])
+  estimate     estimate  @relation(fields: [estimate_id], references: [id])
+  shop         shop      @relation(fields: [shop_id], references: [id])
+  ai_answer    ai_answer @relation(fields: [ai_answer_id], references: [id])
+}
+
+/// @namespace EstimateSystem
+/// @namespace DISK
+model disk_estimate {
+  id           String    @id @db.Uuid
+  disk_id      String    @db.Uuid
+  estimate_id  String    @db.Uuid
+  shop_id      String    @db.Uuid
+  ai_answer_id String    @db.Uuid
+  created_at   DateTime  @default(now()) @db.Timestamptz
+  updated_at   DateTime  @updatedAt @db.Timestamptz
+  deleted_at   DateTime? @db.Timestamptz
+  disk         disk      @relation(fields: [disk_id], references: [id])
   estimate     estimate  @relation(fields: [estimate_id], references: [id])
   shop         shop      @relation(fields: [shop_id], references: [id])
   ai_answer    ai_answer @relation(fields: [ai_answer_id], references: [id])

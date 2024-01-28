@@ -5,13 +5,16 @@
 - [Shop](#shop)
 - [CPU](#cpu)
 - [GPU](#gpu)
+- [MotherBoard](#motherboard)
+- [RAM](#ram)
+- [DISK](#disk)
 
 ## EstimateSystem
 ```mermaid
 erDiagram
 "estimate" {
     String id PK
-    String name "nullable"
+    String name
     Country country
     DateTime created_at
     DateTime updated_at
@@ -19,7 +22,7 @@ erDiagram
 }
 "shop" {
     String id PK
-    String name
+    String name UK
     Country country
     DateTime created_at
     DateTime updated_at
@@ -48,6 +51,7 @@ erDiagram
 }
 "cpu" {
     String id PK
+    String hw_key UK
     String model_name
     String vendor
     Int core_count
@@ -61,6 +65,7 @@ erDiagram
 }
 "gpu" {
     String id PK
+    String hw_key UK
     String model_name
     String chipset
     String vendor
@@ -70,9 +75,72 @@ erDiagram
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
+"motherboard" {
+    String id PK
+    String hw_key UK
+    String model_name
+    String vendor
+    String chipset
+    String metadata "nullable"
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"ram" {
+    String id PK
+    String hw_key UK
+    String model_name
+    String vendor
+    String metadata "nullable"
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"disk" {
+    String id PK
+    String hw_key UK
+    String model_name
+    String vendor
+    String kind
+    Int total_space
+    String metadata "nullable"
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"motherboard_estimate" {
+    String id PK
+    String motherboard_id FK
+    String estimate_id FK
+    String shop_id FK
+    String ai_answer_id FK
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
 "gpu_estimate" {
     String id PK
     String gpu_id FK
+    String estimate_id FK
+    String shop_id FK
+    String ai_answer_id FK
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"ram_estimate" {
+    String id PK
+    String ram_id FK
+    String estimate_id FK
+    String shop_id FK
+    String ai_answer_id FK
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"disk_estimate" {
+    String id PK
+    String disk_id FK
     String estimate_id FK
     String shop_id FK
     String ai_answer_id FK
@@ -100,10 +168,22 @@ erDiagram
 "cpu_estimate" }o--|| "estimate" : estimate
 "cpu_estimate" }o--|| "shop" : shop
 "cpu_estimate" }o--|| "ai_answer" : ai_answer
+"motherboard_estimate" }o--|| "motherboard" : motherboard
+"motherboard_estimate" }o--|| "estimate" : estimate
+"motherboard_estimate" }o--|| "shop" : shop
+"motherboard_estimate" }o--|| "ai_answer" : ai_answer
 "gpu_estimate" }o--|| "gpu" : gpu
 "gpu_estimate" }o--|| "estimate" : estimate
 "gpu_estimate" }o--|| "shop" : shop
 "gpu_estimate" }o--|| "ai_answer" : ai_answer
+"ram_estimate" }o--|| "ram" : ram
+"ram_estimate" }o--|| "estimate" : estimate
+"ram_estimate" }o--|| "shop" : shop
+"ram_estimate" }o--|| "ai_answer" : ai_answer
+"disk_estimate" }o--|| "disk" : disk
+"disk_estimate" }o--|| "estimate" : estimate
+"disk_estimate" }o--|| "shop" : shop
+"disk_estimate" }o--|| "ai_answer" : ai_answer
 "cpu_pricing_table" }o--|| "shop" : shop
 "gpu_pricing_table" }o--|| "shop" : shop
 ```
@@ -157,6 +237,7 @@ erDiagram
 
 **Properties**
   - `id`: 
+  - `hw_key`: 
   - `model_name`: 
   - `vendor`: 
   - `core_count`: 
@@ -172,6 +253,7 @@ erDiagram
 
 **Properties**
   - `id`: 
+  - `hw_key`: 
   - `model_name`: 
   - `chipset`: 
   - `vendor`: 
@@ -181,11 +263,86 @@ erDiagram
   - `updated_at`: 
   - `deleted_at`: 
 
+### `motherboard`
+
+**Properties**
+  - `id`: 
+  - `hw_key`: 
+  - `model_name`: 
+  - `vendor`: 
+  - `chipset`: 
+  - `metadata`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+### `ram`
+
+**Properties**
+  - `id`: 
+  - `hw_key`: 
+  - `model_name`: 
+  - `vendor`: 
+  - `metadata`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+### `disk`
+
+**Properties**
+  - `id`: 
+  - `hw_key`: 
+  - `model_name`: 
+  - `vendor`: 
+  - `kind`: 
+  - `total_space`: 
+  - `metadata`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+### `motherboard_estimate`
+
+**Properties**
+  - `id`: 
+  - `motherboard_id`: 
+  - `estimate_id`: 
+  - `shop_id`: 
+  - `ai_answer_id`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
 ### `gpu_estimate`
 
 **Properties**
   - `id`: 
   - `gpu_id`: 
+  - `estimate_id`: 
+  - `shop_id`: 
+  - `ai_answer_id`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+### `ram_estimate`
+
+**Properties**
+  - `id`: 
+  - `ram_id`: 
+  - `estimate_id`: 
+  - `shop_id`: 
+  - `ai_answer_id`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+### `disk_estimate`
+
+**Properties**
+  - `id`: 
+  - `disk_id`: 
   - `estimate_id`: 
   - `shop_id`: 
   - `ai_answer_id`: 
@@ -219,7 +376,7 @@ erDiagram
 erDiagram
 "shop" {
     String id PK
-    String name
+    String name UK
     Country country
     DateTime created_at
     DateTime updated_at
@@ -281,7 +438,7 @@ erDiagram
 erDiagram
 "shop" {
     String id PK
-    String name
+    String name UK
     Country country
     DateTime created_at
     DateTime updated_at
@@ -310,6 +467,7 @@ erDiagram
 }
 "cpu" {
     String id PK
+    String hw_key UK
     String model_name
     String vendor
     Int core_count
@@ -374,6 +532,7 @@ erDiagram
 
 **Properties**
   - `id`: 
+  - `hw_key`: 
   - `model_name`: 
   - `vendor`: 
   - `core_count`: 
@@ -401,7 +560,7 @@ erDiagram
 erDiagram
 "shop" {
     String id PK
-    String name
+    String name UK
     Country country
     DateTime created_at
     DateTime updated_at
@@ -420,6 +579,7 @@ erDiagram
 }
 "gpu" {
     String id PK
+    String hw_key UK
     String model_name
     String chipset
     String vendor
@@ -480,6 +640,7 @@ erDiagram
 
 **Properties**
   - `id`: 
+  - `hw_key`: 
   - `model_name`: 
   - `chipset`: 
   - `vendor`: 
@@ -507,6 +668,165 @@ erDiagram
   - `id`: 
   - `shop_id`: 
   - `sheets`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+
+## MotherBoard
+```mermaid
+erDiagram
+"motherboard" {
+    String id PK
+    String hw_key UK
+    String model_name
+    String vendor
+    String chipset
+    String metadata "nullable"
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"motherboard_estimate" {
+    String id PK
+    String motherboard_id FK
+    String estimate_id FK
+    String shop_id FK
+    String ai_answer_id FK
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"motherboard_estimate" }o--|| "motherboard" : motherboard
+```
+
+### `motherboard`
+
+**Properties**
+  - `id`: 
+  - `hw_key`: 
+  - `model_name`: 
+  - `vendor`: 
+  - `chipset`: 
+  - `metadata`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+### `motherboard_estimate`
+
+**Properties**
+  - `id`: 
+  - `motherboard_id`: 
+  - `estimate_id`: 
+  - `shop_id`: 
+  - `ai_answer_id`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+
+## RAM
+```mermaid
+erDiagram
+"ram" {
+    String id PK
+    String hw_key UK
+    String model_name
+    String vendor
+    String metadata "nullable"
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"ram_estimate" {
+    String id PK
+    String ram_id FK
+    String estimate_id FK
+    String shop_id FK
+    String ai_answer_id FK
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"ram_estimate" }o--|| "ram" : ram
+```
+
+### `ram`
+
+**Properties**
+  - `id`: 
+  - `hw_key`: 
+  - `model_name`: 
+  - `vendor`: 
+  - `metadata`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+### `ram_estimate`
+
+**Properties**
+  - `id`: 
+  - `ram_id`: 
+  - `estimate_id`: 
+  - `shop_id`: 
+  - `ai_answer_id`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+
+## DISK
+```mermaid
+erDiagram
+"disk" {
+    String id PK
+    String hw_key UK
+    String model_name
+    String vendor
+    String kind
+    Int total_space
+    String metadata "nullable"
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"disk_estimate" {
+    String id PK
+    String disk_id FK
+    String estimate_id FK
+    String shop_id FK
+    String ai_answer_id FK
+    DateTime created_at
+    DateTime updated_at
+    DateTime deleted_at "nullable"
+}
+"disk_estimate" }o--|| "disk" : disk
+```
+
+### `disk`
+
+**Properties**
+  - `id`: 
+  - `hw_key`: 
+  - `model_name`: 
+  - `vendor`: 
+  - `kind`: 
+  - `total_space`: 
+  - `metadata`: 
+  - `created_at`: 
+  - `updated_at`: 
+  - `deleted_at`: 
+
+### `disk_estimate`
+
+**Properties**
+  - `id`: 
+  - `disk_id`: 
+  - `estimate_id`: 
+  - `shop_id`: 
+  - `ai_answer_id`: 
   - `created_at`: 
   - `updated_at`: 
   - `deleted_at`: 
