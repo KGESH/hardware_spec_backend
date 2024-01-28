@@ -1,8 +1,12 @@
-import { IHardware } from './hardware.dto';
+import { HardwareDto } from './hardware.dto';
 
-export type CpuDto = IHardware & {
-  coreCount?: number;
-  threadCount?: number;
-  baseClock?: number;
-  boostClock?: number;
+export type CpuDto = HardwareDto & {
+  coreCount: number;
+  threadCount: number | null;
+  baseClock: number | null;
+  boostClock: number | null;
 };
+
+export type CpuCreateDto = Omit<CpuDto, 'type'>;
+
+export type CpuQueryDto = Pick<CpuDto, 'hwKey'>;
