@@ -1,5 +1,5 @@
-import { IHardware } from './hardware.dto';
+import { HardwareDto } from './hardware.dto';
 
-export type MotherboardDto = IHardware & {
+export type MotherboardDto = HardwareDto & {
   chipset?: string;
 };
