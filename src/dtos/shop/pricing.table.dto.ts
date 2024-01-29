@@ -8,14 +8,15 @@ export type PricingTableDto = {
   sheets: string;
   createdAt: string & tags.Format<'date-time'>;
   updatedAt: string & tags.Format<'date-time'>;
-  deletedAt?: string & tags.Format<'date-time'>;
+  deletedAt: (string & tags.Format<'date-time'>) | null;
 };
 
-export type PricingTableQueryDto =
-  | Pick<PricingTableDto, 'id'>
-  | Pick<PricingTableDto, 'shopId' | 'type'>;
+export type PricingTableQueryDto = Pick<PricingTableDto, 'shopId' | 'type'>;
 
-export type PricingTableCreateDto = Pick<PricingTableDto, 'sheets' | 'shopId'>;
+export type PricingTableCreateDto = Pick<
+  PricingTableDto,
+  'type' | 'shopId' | 'sheets'
+>;
 
 export type PricingTableUpdateDto = Pick<PricingTableDto, 'id'> &
   Partial<PricingTableDto>;

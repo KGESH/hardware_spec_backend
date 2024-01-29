@@ -366,7 +366,7 @@ model cpu_pricing_table {
   created_at DateTime  @default(now()) @db.Timestamptz
   updated_at DateTime  @updatedAt @db.Timestamptz
   deleted_at DateTime? @db.Timestamptz
-  shop       shop      @relation(fields: [shop_id], references: [id])
+  shop       shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
 }
 
 /// @namespace EstimateSystem
@@ -378,7 +378,7 @@ model gpu_pricing_table {
   created_at DateTime  @default(now()) @db.Timestamptz
   updated_at DateTime  @updatedAt @db.Timestamptz
   deleted_at DateTime? @db.Timestamptz
-  shop       shop      @relation(fields: [shop_id], references: [id])
+  shop       shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
 }
 
 /// @namespace EstimateSystem
@@ -390,7 +390,7 @@ model motherboard_pricing_table {
   created_at DateTime  @default(now()) @db.Timestamptz
   updated_at DateTime  @updatedAt @db.Timestamptz
   deleted_at DateTime? @db.Timestamptz
-  shop       shop      @relation(fields: [shop_id], references: [id])
+  shop       shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
 }
 
 /// @namespace EstimateSystem
@@ -402,7 +402,7 @@ model ram_pricing_table {
   created_at DateTime  @default(now()) @db.Timestamptz
   updated_at DateTime  @updatedAt @db.Timestamptz
   deleted_at DateTime? @db.Timestamptz
-  shop       shop      @relation(fields: [shop_id], references: [id])
+  shop       shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
 }
 
 /// @namespace EstimateSystem
@@ -414,5 +414,5 @@ model disk_pricing_table {
   created_at DateTime  @default(now()) @db.Timestamptz
   updated_at DateTime  @updatedAt @db.Timestamptz
   deleted_at DateTime? @db.Timestamptz
-  shop       shop      @relation(fields: [shop_id], references: [id])
+  shop       shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
 }

@@ -6,6 +6,7 @@ import { EstimateModule } from './modules/estimate/estimate.module';
 import { RedisModule } from './modules/infra/redis.module';
 import { EventSubscribeModule } from './modules/infra/eventSubscribe.module';
 import { ShopModule } from './modules/shop/shop.module';
+import { PricingTableModule } from './modules/shop/pricingTable.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ShopModule } from './modules/shop/shop.module';
     RedisModule,
     EstimateModule,
     EventSubscribeModule,
+    PricingTableModule,
     ShopModule,
   ],
   controllers: [AppController],

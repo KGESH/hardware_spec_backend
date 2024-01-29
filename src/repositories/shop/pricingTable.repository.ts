@@ -1,11 +1,11 @@
 import { BaseRepository } from '../base.repository';
-import { PricingTableDto } from '../../dtos/shop/pricing.table.dto';
+import { IPricingTable } from '../../interfaces/shop/pricingTable.interface';
 
 export class PricingTableRepository extends BaseRepository<
   { str: string },
-  PricingTableDto
+  IPricingTable
 > {
-  protected _transform(entity: { str: string }): PricingTableDto {
+  protected _transform(entity: { str: string }): IPricingTable {
     throw new Error('Method not implemented.');
   }
 }
