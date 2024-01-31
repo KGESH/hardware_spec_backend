@@ -8,6 +8,8 @@ type IDatabaseConfigs = {
 type ICacheConfigs = {
   REDIS_PORT: number & tags.Minimum<0> & tags.Maximum<65535>;
   REDIS_HOST: string;
+  REDIS_USERNAME?: string; // only production
+  REDIS_PASSWORD?: string; // only production
 };
 
 type IGoogleAIConfigs = {

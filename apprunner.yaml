@@ -22,6 +22,10 @@ run:
       value-from: 'arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU:REDIS_HOST::'
     - name: REDIS_PORT
       value-from: 'arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU:REDIS_PORT::'
+    - name: REDIS_USERNAME
+      value-from: 'arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU:REDIS_USERNAME::'
+    - name: REDIS_PASSWORD
+      value-from: 'arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU:REDIS_PASSWORD::'
     - name: GOOGLE_API_KEY
       value-from: 'arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU:GOOGLE_API_KEY::'
     - name: KOREA_CRAWLING_BASE_URL

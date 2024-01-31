@@ -33,6 +33,8 @@ export class ConfigsService {
       DIRECT_URL: process.env.DIRECT_URL as string,
       REDIS_HOST: process.env.REDIS_HOST as string,
       REDIS_PORT: +(process.env.REDIS_PORT as string),
+      REDIS_USERNAME: process.env.REDIS_USERNAME as string,
+      REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
       GOOGLE_API_KEY: process.env.GOOGLE_API_KEY as string,
       KOREA_CRAWLING_BASE_URL: process.env.KOREA_CRAWLING_BASE_URL as string,
     };
@@ -60,6 +62,8 @@ export class ConfigsService {
       DIRECT_URL: this.dotEnv.get('DIRECT_URL') as string,
       REDIS_HOST: this.dotEnv.get('REDIS_HOST') as string,
       REDIS_PORT: +this.dotEnv.get('REDIS_PORT'),
+      REDIS_USERNAME: this.dotEnv.get('REDIS_USERNAME') as string,
+      REDIS_PASSWORD: this.dotEnv.get('REDIS_PASSWORD') as string,
       GOOGLE_API_KEY: this.dotEnv.get('GOOGLE_API_KEY') as string,
       KOREA_CRAWLING_BASE_URL: this.dotEnv.get(
         'KOREA_CRAWLING_BASE_URL',

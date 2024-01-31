@@ -13,6 +13,8 @@ export const redisFactory: FactoryProvider = {
     const redis = new Redis({
       host: configService.env.REDIS_HOST,
       port: configService.env.REDIS_PORT,
+      username: configService.env.REDIS_USERNAME,
+      password: configService.env.REDIS_PASSWORD,
     });
 
     redis.on('error', (error) => {

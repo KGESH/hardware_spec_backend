@@ -16,6 +16,8 @@ async function bootstrap() {
       options: {
         host: configsService.env.REDIS_HOST,
         port: configsService.env.REDIS_PORT,
+        username: configsService.env.REDIS_USERNAME,
+        password: configsService.env.REDIS_PASSWORD,
       },
     },
     { inheritAppConfig: true },
