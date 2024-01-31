@@ -4,7 +4,7 @@ runtime: nodejs18
 build:
   commands:
     build:
-      - npm install pnpm -g
+      - npm install -g pnpm
       - pnpm install --frozen-lockfile
       - pnpm run build
 
