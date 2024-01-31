@@ -5,7 +5,7 @@ build:
   commands:
     build:
       - npm install -g pnpm
-      - pnpm install --frozen-lockfile
+      - pnpm install
       - pnpm run build
 
 run:
