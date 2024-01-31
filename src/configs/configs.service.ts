@@ -28,13 +28,13 @@ export class ConfigsService {
   private _loadProductionConfigs() {
     this.logger.verbose(`Load production configuration`);
 
-    const fromExternal = {
-      DATABASE_URL: process.env.DATABASE_URL,
-      DIRECT_URL: process.env.DIRECT_URL,
-      REDIS_HOST: process.env.REDIS_HOST,
+    const fromExternal: IConfiguration = {
+      DATABASE_URL: process.env.DATABASE_URL as string,
+      DIRECT_URL: process.env.DIRECT_URL as string,
+      REDIS_HOST: process.env.REDIS_HOST as string,
       REDIS_PORT: +(process.env.REDIS_PORT as string),
-      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
-      KOREA_CRAWLING_BASE_URL: process.env.KOREA_CRAWLING_BASE_URL,
+      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY as string,
+      KOREA_CRAWLING_BASE_URL: process.env.KOREA_CRAWLING_BASE_URL as string,
     };
 
     const productionConfigs = typia.validate<IConfiguration>(fromExternal);
@@ -55,13 +55,15 @@ export class ConfigsService {
   private _loadDevelopmentConfigs() {
     this.logger.verbose(`Load Development configuration`);
 
-    const fromDotEnv = {
-      DATABASE_URL: this.dotEnv.get('DATABASE_URL'),
-      DIRECT_URL: this.dotEnv.get('DIRECT_URL'),
-      REDIS_HOST: this.dotEnv.get('REDIS_HOST'),
+    const fromDotEnv: IConfiguration = {
+      DATABASE_URL: this.dotEnv.get('DATABASE_URL') as string,
+      DIRECT_URL: this.dotEnv.get('DIRECT_URL') as string,
+      REDIS_HOST: this.dotEnv.get('REDIS_HOST') as string,
       REDIS_PORT: +this.dotEnv.get('REDIS_PORT'),
-      GOOGLE_API_KEY: this.dotEnv.get('GOOGLE_API_KEY'),
-      KOREA_CRAWLING_BASE_URL: this.dotEnv.get('KOREA_CRAWLING_BASE_URL'),
+      GOOGLE_API_KEY: this.dotEnv.get('GOOGLE_API_KEY') as string,
+      KOREA_CRAWLING_BASE_URL: this.dotEnv.get(
+        'KOREA_CRAWLING_BASE_URL',
+      ) as string,
     };
 
     const devConfigs = typia.validate<IConfiguration>(fromDotEnv);
