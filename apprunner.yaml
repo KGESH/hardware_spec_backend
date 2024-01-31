@@ -10,7 +10,7 @@ build:
       - npx pnpm run build
 
 run:
-  command: pnpm run start:prod
+  command: node dist/main
   network:
     port: 3030
   secrets:
