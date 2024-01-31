@@ -1,15 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { LangChainService } from '../ai/langChain.service';
-import { AI_SAMPLE_COMPUTER_PROMPT } from '../../constants/ai.constants';
 import { aiAnswerSchema } from '../../schemas/langchain.schema';
 import { EstimateService } from './estimate.service';
-import { HardwareDto } from '../../dtos/computer/hardware.dto';
-import { CpuDto } from '../../dtos/computer/cpu.dto';
-import { GpuDto } from '../../dtos/computer/gpu.dto';
-import { MotherboardDto } from '../../dtos/computer/motherboard.dto';
-import { RamDto } from '../../dtos/computer/ram.dto';
-import { DiskDto } from '../../dtos/computer/disk.dto';
-import { UnknownException } from '../../exceptions/unknown.exception';
 import { IComputer } from '../../interfaces/computer/computer.interface';
 import { IHardware } from '../../interfaces/computer/hardware.interface';
 import {
@@ -19,6 +11,7 @@ import {
 import { IAIResponse } from '../../interfaces/ai/aiAnswer.interface';
 import { ICurrency } from '../../interfaces/common.interface';
 import { AIEstimateResponseDto } from '../../dtos/estimate/estimate.dto';
+import { PromptService } from '../shop/prompt.service';
 
 @Injectable()
 export class EstimateAIService {
@@ -27,6 +20,7 @@ export class EstimateAIService {
   constructor(
     private readonly langChainService: LangChainService,
     private readonly estimateService: EstimateService,
+    private readonly promptService: PromptService,
   ) {}
 
   async cacheEstimateStatus(response: AIEstimateResponseDto) {
@@ -49,10 +43,10 @@ export class EstimateAIService {
     const hardwareComponents: IHardware[] = [];
 
     if (cpu) hardwareComponents.push(cpu);
-    if (gpu) hardwareComponents.push(gpu);
-    if (motherboard) hardwareComponents.push(motherboard);
-    if (rams) hardwareComponents.push(...rams);
-    if (disks) hardwareComponents.push(...disks);
+    // if (gpu) hardwareComponents.push(gpu);
+    // if (motherboard) hardwareComponents.push(motherboard);
+    // if (rams) hardwareComponents.push(...rams);
+    // if (disks) hardwareComponents.push(...disks);
 
     const estimatePromises: Promise<IPartEstimate>[] = [];
     const cachedEstimates: IPartEstimate[] = [];
@@ -92,13 +86,15 @@ export class EstimateAIService {
     currency,
     estimateId,
   }: Omit<IPartEstimateCreate, 'aiResponse'>): Promise<IPartEstimate> {
-    const query = this._buildPromptQueryForHardware(hardware);
+    const estimatePrompt = await this.promptService.buildPrompt(
+      shopId,
+      hardware,
+    );
 
     return this.langChainService
       .chatToAI<IAIResponse>({
-        systemInput: AI_SAMPLE_COMPUTER_PROMPT,
+        estimatePrompt: estimatePrompt,
         responseSchema: aiAnswerSchema,
-        query,
       })
       .then((aiAnswer) => {
         return this.estimateService.saveEstimatePart({
@@ -111,42 +107,49 @@ export class EstimateAIService {
       });
   }
 
-  private _buildPromptQueryForHardware(hardware: HardwareDto): string {
-    // Construct and return the query string based on the specific hardware type and attributes
-
-    switch (hardware.type) {
-      case 'CPU':
-        const cpu = hardware as CpuDto;
-        return `${cpu.displayName}`
-          .concat(cpu?.coreCount ? ` / ${cpu.coreCount} cores` : '')
-          .concat(cpu?.threadCount ? ` / ${cpu.threadCount} threads` : '')
-          .concat(cpu?.baseClock ? ` / ${cpu.baseClock} GHz` : '')
-          .concat(cpu?.boostClock ? `@ ${cpu.boostClock} GHz` : '');
-
-      case 'GPU':
-        const gpu = hardware as GpuDto;
-        return `${gpu.displayName} / ${gpu.vendorName}`.concat(
-          gpu?.subVendorName ? ` / ${gpu.subVendorName}` : '',
-        );
-
-      case 'MB':
-        const motherboard = hardware as MotherboardDto;
-        return `${motherboard.displayName}`
-          .concat(motherboard?.vendorName ? ` / ${motherboard.vendorName}` : '')
-          .concat(motherboard?.chipset ? ` / ${motherboard.chipset}` : '');
-
-      case 'RAM':
-        const ram = hardware as RamDto;
-        return `${ram.displayName} / ${ram.vendorName}`;
-
-      case 'DISK':
-        const disk = hardware as DiskDto;
-        return `${disk.displayName} / ${disk.vendorName}`
-          .concat(disk?.kind ? ` / ${disk.kind}` : '')
-          .concat(disk?.totalSpace ? ` / ${disk.totalSpace}` : '');
-
-      default:
-        throw new UnknownException('buildPromptQueryForHardware');
-    }
-  }
+  // private async _buildPrompt(
+  //   shopId: string,
+  //   hardware: IHardware,
+  // ): Promise<IQueryPrompt> {
+  //   return this.promptService.buildPrompt(shopId, hardware);
+  // }
+  //
+  // private _buildHardwareSpecPrompt(hardware: HardwareDto): string {
+  //   // Construct and return the query string based on the specific hardware type and attributes
+  //
+  //   switch (hardware.type) {
+  //     case 'CPU':
+  //       const cpu = hardware as CpuDto;
+  //       return `${cpu.displayName}`
+  //         .concat(cpu?.coreCount ? ` / ${cpu.coreCount} cores` : '')
+  //         .concat(cpu?.threadCount ? ` / ${cpu.threadCount} threads` : '')
+  //         .concat(cpu?.baseClock ? ` / ${cpu.baseClock} GHz` : '')
+  //         .concat(cpu?.boostClock ? `@ ${cpu.boostClock} GHz` : '');
+  //
+  //     case 'GPU':
+  //       const gpu = hardware as GpuDto;
+  //       return `${gpu.displayName} / ${gpu.vendorName}`.concat(
+  //         gpu?.subVendorName ? ` / ${gpu.subVendorName}` : '',
+  //       );
+  //
+  //     case 'MB':
+  //       const motherboard = hardware as MotherboardDto;
+  //       return `${motherboard.displayName}`
+  //         .concat(motherboard?.vendorName ? ` / ${motherboard.vendorName}` : '')
+  //         .concat(motherboard?.chipset ? ` / ${motherboard.chipset}` : '');
+  //
+  //     case 'RAM':
+  //       const ram = hardware as RamDto;
+  //       return `${ram.displayName} / ${ram.vendorName}`;
+  //
+  //     case 'DISK':
+  //       const disk = hardware as DiskDto;
+  //       return `${disk.displayName} / ${disk.vendorName}`
+  //         .concat(disk?.kind ? ` / ${disk.kind}` : '')
+  //         .concat(disk?.totalSpace ? ` / ${disk.totalSpace}` : '');
+  //
+  //     default:
+  //       throw new UnknownException('buildPromptQueryForHardware');
+  //   }
+  // }
 }

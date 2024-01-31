@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
 import { BusinessExceptionFilter } from './filters/businessException.filter';
+import { ConfigsService } from './configs/configs.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
+  const configsService = app.get(ConfigsService);
 
   app.enableCors();
   app.useGlobalFilters(new BusinessExceptionFilter());
@@ -14,8 +14,8 @@ async function bootstrap() {
     {
       transport: Transport.REDIS,
       options: {
-        host: configService.get('REDIS_HOST'),
-        port: +configService.get('REDIS_PORT'),
+        host: configsService.env.REDIS_HOST,
+        port: configsService.env.REDIS_PORT,
       },
     },
     { inheritAppConfig: true },

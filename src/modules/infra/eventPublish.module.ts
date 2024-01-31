@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
 import { REDIS_PUB } from '../../constants/redis.constant';
 import { EventPublishService } from '../../services/infra/eventPublish.service';
+import { ConfigsService } from '../../configs/configs.service';
 
 @Module({
   imports: [
     ClientsModule.registerAsync([
       {
-        inject: [ConfigService],
+        inject: [ConfigsService],
         name: REDIS_PUB,
-        useFactory: (configService: ConfigService) => {
+        useFactory: (configService: ConfigsService) => {
           return {
             transport: Transport.REDIS,
             options: {
-              host: configService.get('REDIS_HOST'),
-              port: +configService.get('REDIS_PORT'),
+              host: configService.env.REDIS_HOST,
+              port: +configService.env.REDIS_PORT,
             },
           };
         },

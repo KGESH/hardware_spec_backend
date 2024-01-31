@@ -19,6 +19,7 @@ import { MotherboardEstimateRepository } from '../../repositories/estimate/mothe
 import { RamEstimateRepository } from '../../repositories/estimate/ramEstimate.repository';
 import { DiskEstimateRepository } from '../../repositories/estimate/diskEstimate.repository';
 import { ShopModule } from '../shop/shop.module';
+import { PromptService } from '../../services/shop/prompt.service';
 
 @Module({
   imports: [

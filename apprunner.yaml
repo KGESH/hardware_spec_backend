@@ -1,0 +1,27 @@
+version: 1.0
+runtime: nodejs18
+
+build:
+  commands:
+    build:
+      - npm install pnpm -g
+      - pnpm install --frozen-lockfile
+      - pnpm run build
+
+run:
+  command: pnpm run start:prod
+  network:
+    port: 3030
+  env:
+    - name: DATABASE_URL
+      value_from: arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU::DATABASE_URL
+    - name: DIRECT_URL
+      value_from: arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU::DIRECT_URL
+    - name: REDIS_HOST
+      value_from: arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU::REDIS_HOST
+    - name: REDIS_PORT
+      value_from: arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU::REDIS_PORT
+    - name: GOOGLE_API_KEY
+      value_from: arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU::GOOGLE_API_KEY
+    - name: KOREA_CRAWLING_BASE_URL
+      value_from: arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU::KOREA_CRAWLING_BASE_URL

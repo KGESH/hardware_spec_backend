@@ -1,18 +1,18 @@
 import { FactoryProvider, Logger, Module } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { REDIS } from '../../constants/redis.constant';
-import { ConfigService } from '@nestjs/config';
 import { RedisRepository } from '../../repositories/infra/redis.repository';
 import { IRedisRepository } from '../../interfaces/infra/redis.repository.interface';
 import { RedisService } from '../../services/infra/redis.service';
+import { ConfigsService } from '../../configs/configs.service';
 
 export const redisFactory: FactoryProvider = {
-  inject: [ConfigService],
+  inject: [ConfigsService],
   provide: REDIS,
-  useFactory(configService: ConfigService): Redis {
+  useFactory(configService: ConfigsService): Redis {
     const redis = new Redis({
-      host: configService.get('REDIS_HOST'),
-      port: +configService.get('REDIS_PORT'),
+      host: configService.env.REDIS_HOST,
+      port: configService.env.REDIS_PORT,
     });
 
     redis.on('error', (error) => {
@@ -25,7 +25,6 @@ export const redisFactory: FactoryProvider = {
 };
 
 @Module({
-  imports: [],
   providers: [
     redisFactory,
     {

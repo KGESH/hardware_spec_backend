@@ -8,11 +8,14 @@ import { RamPricingTableRepository } from '../../repositories/shop/ramPricingTab
 import { DiskPricingTableRepository } from '../../repositories/shop/diskPricingTable.repository';
 import { PricingTableController } from '../../controllers/pricingTable.controller';
 import { ShopModule } from './shop.module';
+import { PromptService } from '../../services/shop/prompt.service';
+import { RedisModule } from '../infra/redis.module';
 
 @Module({
-  imports: [PrismaModule, ShopModule],
+  imports: [PrismaModule, ShopModule, RedisModule],
   controllers: [PricingTableController],
   providers: [
+    PromptService,
     PricingTableService,
     CpuPricingTableRepository,
     GpuPricingTableRepository,
@@ -20,6 +23,6 @@ import { ShopModule } from './shop.module';
     RamPricingTableRepository,
     DiskPricingTableRepository,
   ],
-  exports: [PricingTableService],
+  exports: [PromptService, PricingTableService],
 })
 export class PricingTableModule {}
