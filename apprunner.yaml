@@ -6,8 +6,8 @@ build:
     build:
       - npx pnpm install
       - npx pnpm install --frozen-lockfile
-      - npx pnpm run build
       - npx pnpm dlx prisma generate
+      - npx pnpm run build
 
 run:
   command: pnpm run start:prod
