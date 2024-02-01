@@ -29,6 +29,7 @@ export class ConfigsService {
     this.logger.verbose(`Load production configuration`);
 
     const fromExternal: IConfiguration = {
+      DEBUG_SHOP_ID: process.env.DEBUG_SHOP_ID as string, // Todo: remove
       DATABASE_URL: process.env.DATABASE_URL as string,
       DIRECT_URL: process.env.DIRECT_URL as string,
       REDIS_HOST: process.env.REDIS_HOST as string,
@@ -58,6 +59,7 @@ export class ConfigsService {
     this.logger.verbose(`Load Development configuration`);
 
     const fromDotEnv: IConfiguration = {
+      DEBUG_SHOP_ID: this.dotEnv.get('DEBUG_SHOP_ID') as string, // Todo: remove
       DATABASE_URL: this.dotEnv.get('DATABASE_URL') as string,
       DIRECT_URL: this.dotEnv.get('DIRECT_URL') as string,
       REDIS_HOST: this.dotEnv.get('REDIS_HOST') as string,

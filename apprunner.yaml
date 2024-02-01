@@ -13,6 +13,10 @@ run:
   command: node dist/main
   network:
     port: 3030
+
+  env:
+    - name: DEBUG_SHOP_ID
+      value: '1f730024-f112-4532-ac30-7ba25eea955e'
   secrets:
     - name: DATABASE_URL
       value-from: 'arn:aws:secretsmanager:ap-northeast-1:900734169075:secret:estimate_backend-CCVbbU:DATABASE_URL::'

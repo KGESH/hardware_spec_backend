@@ -13,18 +13,22 @@ import { ComputerService } from '../services/computer/computer.service';
 import { EntityNotfoundException } from '../exceptions/entityNotfound.exception';
 import { ESTIMATE_CREATE_EVENT } from '../constants/estimate.constant';
 import { ShopService } from '../services/shop/shop.service';
+import { ConfigsService } from '../configs/configs.service';
 
 @Controller('estimate')
 export class EstimateController {
   private readonly logger = new Logger(EstimateController.name);
-  private readonly shopId = '1f730024-f112-4532-ac30-7ba25eea955e'; // Todo: replace to real shopId
+  private readonly devShopId: string;
 
   constructor(
+    private readonly configService: ConfigsService,
     private readonly estimateService: EstimateService,
     private readonly computerService: ComputerService,
     private readonly eventService: EventPublishService,
     private readonly shopService: ShopService,
-  ) {}
+  ) {
+    this.devShopId = this.configService.env.DEBUG_SHOP_ID;
+  }
 
   @TypedRoute.Get('/:estimateId')
   async getEstimate(
@@ -56,7 +60,7 @@ export class EstimateController {
       status: 'success',
       data: {
         status: 'estimated',
-        shopId: this.shopId,
+        shopId: this.devShopId,
         estimateId: estimate.id,
         estimates: estimate.parts,
       },
@@ -70,7 +74,7 @@ export class EstimateController {
   ): Promise<ResponseDto<EstimateCreateResponseDto>> {
     this.logger.debug(`Body`, encodedId, computerDto);
 
-    const shop = await this.shopService.findBy({ id: this.shopId });
+    const shop = await this.shopService.findBy({ id: this.devShopId });
 
     if (!shop) throw new EntityNotfoundException({ message: `Shop not found` });
 
@@ -80,7 +84,7 @@ export class EstimateController {
     });
 
     const aiRequestDto: EstimateRequestDto = {
-      shopId: this.shopId, // Todo: replace to real shopId
+      shopId: this.devShopId, // Todo: replace to real shopId
       estimateId: estimate.id,
       computer: computerDto,
     };
@@ -90,7 +94,7 @@ export class EstimateController {
     await this.estimateService.cacheEstimate({
       status: 'draft',
       estimateId: estimate.id,
-      shopId: this.shopId,
+      shopId: this.devShopId,
     });
 
     // Todo: change cache logic. remove encoded Id

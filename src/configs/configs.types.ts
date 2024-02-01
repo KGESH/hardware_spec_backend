@@ -20,7 +20,12 @@ type ICrawlingConfigs = {
   KOREA_CRAWLING_BASE_URL: string & tags.Format<'url'>;
 };
 
-export type IConfiguration = IDatabaseConfigs &
+type IDebug = {
+  DEBUG_SHOP_ID: string;
+};
+
+export type IConfiguration = IDebug &
   ICacheConfigs &
   IGoogleAIConfigs &
-  ICrawlingConfigs;
+  ICrawlingConfigs &
+  IDatabaseConfigs;

@@ -36,6 +36,8 @@ export class PromptService {
       type: hardware.type,
     });
 
+    // Todo: crawling pricing table
+
     if (!pricingTable) {
       throw new EntityNotfoundException({ message: `Pricing table not found` });
     }
