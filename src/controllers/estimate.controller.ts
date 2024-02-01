@@ -17,7 +17,7 @@ import { ShopService } from '../services/shop/shop.service';
 @Controller('estimate')
 export class EstimateController {
   private readonly logger = new Logger(EstimateController.name);
-  private readonly shopId = '3d264daf-5aee-4e6e-afdc-31801beb04ad'; // Todo: replace to real shopId
+  private readonly shopId = '1f730024-f112-4532-ac30-7ba25eea955e'; // Todo: replace to real shopId
 
   constructor(
     private readonly estimateService: EstimateService,
