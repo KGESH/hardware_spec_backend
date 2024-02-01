@@ -24,10 +24,18 @@ export class EstimateController {
     private readonly configService: ConfigsService,
     private readonly estimateService: EstimateService,
     private readonly computerService: ComputerService,
-    private readonly eventService: EventPublishService,
+    private readonly eventPublishService: EventPublishService,
     private readonly shopService: ShopService,
   ) {
     this.devShopId = this.configService.env.DEBUG_SHOP_ID;
+  }
+
+  @TypedRoute.Get('/')
+  async debugRedisPub() {
+    this.logger.verbose(`sampleRedisPub`);
+    return await this.eventPublishService.emit(ESTIMATE_CREATE_EVENT, {
+      test: 'test',
+    });
   }
 
   @TypedRoute.Get('/:estimateId')
@@ -100,7 +108,7 @@ export class EstimateController {
     // Todo: change cache logic. remove encoded Id
     // Request Estimate from AI.
     await this.computerService.cacheComputerSpec(encodedId, computerDto);
-    await this.eventService.emit(ESTIMATE_CREATE_EVENT, aiRequestDto);
+    await this.eventPublishService.emit(ESTIMATE_CREATE_EVENT, aiRequestDto);
 
     return {
       status: 'success',

@@ -15,7 +15,9 @@ import { ConfigsService } from '../../configs/configs.service';
             transport: Transport.REDIS,
             options: {
               host: configService.env.REDIS_HOST,
-              port: +configService.env.REDIS_PORT,
+              port: configService.env.REDIS_PORT,
+              username: configService.env.REDIS_USERNAME,
+              password: configService.env.REDIS_PASSWORD,
             },
           };
         },

@@ -30,9 +30,9 @@ export class EventSubscribeController {
     const { shopId, estimateId } = data;
 
     const computer = await this.computerService.getComputer(data.computer);
+    this.logger.debug(computer);
 
     const shop = await this.shopService.findBy({ id: shopId });
-
     if (!shop) throw new EntityNotfoundException({ message: `Shop not found` });
 
     // Todo: make dto

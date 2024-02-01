@@ -6,8 +6,9 @@ type IDatabaseConfigs = {
 };
 
 type ICacheConfigs = {
-  REDIS_PORT: number & tags.Minimum<0> & tags.Maximum<65535>;
+  REDIS_URI: string & tags.Format<'url'>;
   REDIS_HOST: string;
+  REDIS_PORT: number & tags.Minimum<0> & tags.Maximum<65535>;
   REDIS_USERNAME?: string; // only production
   REDIS_PASSWORD?: string; // only production
 };
@@ -24,7 +25,7 @@ type IDebug = {
   DEBUG_SHOP_ID: string;
 };
 
-export type IConfiguration = IDebug &
+export type IEnvironment = IDebug &
   ICacheConfigs &
   IGoogleAIConfigs &
   ICrawlingConfigs &
