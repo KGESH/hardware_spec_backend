@@ -25,7 +25,5 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(3030);
-
-  app.enableCors();
 }
 bootstrap();
