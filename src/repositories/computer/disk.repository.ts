@@ -62,4 +62,24 @@ export class DiskRepository extends BaseRepository<disk, IDisk> {
       this._handlePrismaError(e, `DISK already exists.`);
     }
   }
+
+  async createIfNotExist(dto: IDiskCreate): Promise<IDisk> {
+    try {
+      const disk = await this.prisma.disk.upsert({
+        where: { hw_key: dto.hwKey },
+        update: {},
+        create: {
+          id: uuidV4(),
+          hw_key: dto.hwKey,
+          kind: dto.kind,
+          total_space: dto.totalSpace,
+          model_name: dto.displayName,
+          vendor: dto.vendorName,
+        },
+      });
+      return this._transform(disk);
+    } catch (e) {
+      this._handlePrismaError(e, `DISK createIfNotExist unknown error.`);
+    }
+  }
 }

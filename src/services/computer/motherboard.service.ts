@@ -26,6 +26,6 @@ export class MotherboardService {
 
     if (motherboard) return motherboard;
 
-    return this.motherboardRepository.create(dto);
+    return this.motherboardRepository.createIfNotExist(dto);
   }
 }

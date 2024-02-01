@@ -24,6 +24,6 @@ export class RamService {
 
     if (ram) return ram;
 
-    return this.ramRepository.create(dto);
+    return this.ramRepository.createIfNotExist(dto);
   }
 }

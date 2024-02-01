@@ -24,6 +24,6 @@ export class CpuService {
 
     if (cpu) return cpu;
 
-    return this.cpuRepository.create(dto);
+    return this.cpuRepository.createIfNotExist(dto);
   }
 }

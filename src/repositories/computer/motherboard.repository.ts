@@ -61,4 +61,23 @@ export class MotherboardRepository extends BaseRepository<
       this._handlePrismaError(e, `M/B already exists.`);
     }
   }
+
+  async createIfNotExist(dto: IMotherboardCreate): Promise<IMotherboard> {
+    try {
+      const motherboard = await this.prisma.motherboard.upsert({
+        where: { hw_key: dto.hwKey },
+        update: {},
+        create: {
+          id: uuidV4(),
+          hw_key: dto.hwKey,
+          chipset: dto.chipset,
+          model_name: dto.displayName,
+          vendor: dto.vendorName,
+        },
+      });
+      return this._transform(motherboard);
+    } catch (e) {
+      this._handlePrismaError(e, `M/B createIfNotExist unknown error.`);
+    }
+  }
 }

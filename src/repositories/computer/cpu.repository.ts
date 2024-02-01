@@ -63,4 +63,26 @@ export class CpuRepository extends BaseRepository<cpu, ICpu> {
       this._handlePrismaError(e, `CPU already exists.`);
     }
   }
+
+  async createIfNotExist(dto: ICpuCreate): Promise<ICpu> {
+    try {
+      const cpu = await this.prisma.cpu.upsert({
+        where: { hw_key: dto.hwKey },
+        update: {},
+        create: {
+          id: uuidV4(),
+          hw_key: dto.hwKey,
+          model_name: dto.displayName,
+          vendor: dto.vendorName,
+          core_count: dto.coreCount,
+          thread_count: dto.threadCount,
+          base_clock: dto.baseClock,
+          boost_clock: dto.boostClock,
+        },
+      });
+      return this._transform(cpu);
+    } catch (e) {
+      this._handlePrismaError(e, `CPU createIfNotExist unknown error.`);
+    }
+  }
 }

@@ -60,4 +60,24 @@ export class GpuRepository extends BaseRepository<gpu, IGpu> {
       this._handlePrismaError(e, `GPU already exists.`);
     }
   }
+
+  async createIfNotExist(dto: IGpuCreate): Promise<IGpu> {
+    try {
+      const gpu = await this.prisma.gpu.upsert({
+        where: { hw_key: dto.hwKey },
+        update: {},
+        create: {
+          id: uuidV4(),
+          hw_key: dto.hwKey,
+          chipset: dto.chipset,
+          model_name: dto.displayName,
+          vendor: dto.vendorName,
+          sub_vendor: dto.subVendorName,
+        },
+      });
+      return this._transform(gpu);
+    } catch (e) {
+      this._handlePrismaError(e, `GPU createIfNotExist unknown error.`);
+    }
+  }
 }

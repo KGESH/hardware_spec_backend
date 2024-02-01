@@ -24,6 +24,6 @@ export class GpuService {
 
     if (gpu) return gpu;
 
-    return this.gpuRepository.create(dto);
+    return this.gpuRepository.createIfNotExist(dto);
   }
 }

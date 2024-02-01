@@ -56,4 +56,22 @@ export class RamRepository extends BaseRepository<ram, IRam> {
       this._handlePrismaError(e, `RAM already exists.`);
     }
   }
+
+  async createIfNotExist(dto: IRamCreate): Promise<IRam> {
+    try {
+      const ram = await this.prisma.ram.upsert({
+        where: { hw_key: dto.hwKey },
+        update: {},
+        create: {
+          id: uuidV4(),
+          hw_key: dto.hwKey,
+          model_name: dto.displayName,
+          vendor: dto.vendorName,
+        },
+      });
+      return this._transform(ram);
+    } catch (e) {
+      this._handlePrismaError(e, `RAM createIfNotExist unknown error.`);
+    }
+  }
 }

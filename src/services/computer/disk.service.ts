@@ -24,6 +24,6 @@ export class DiskService {
 
     if (disk) return disk;
 
-    return this.diskRepository.create(dto);
+    return this.diskRepository.createIfNotExist(dto);
   }
 }
