@@ -4,6 +4,34 @@ type IntelCpu = {
   normalizedPrice: number; // e.g., 1000000
 };
 
+/**
+ * @param model - "Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz"
+ * @returns normalizedCpuModelName - "i7 8700k"
+ */
+export function normalizeIntelCpuModel(model: string): string {
+  // First, try to match the model names commonly found in Intel Core series
+  const coreModelMatch = model.match(/\b(i\d[\s-]?\d+(K|KS|KF|F)?)\b/gi);
+
+  // If a Core series model name is found, format it to remove dashes, ensure spaces, and lowercase
+  if (coreModelMatch && coreModelMatch.length > 0) {
+    return coreModelMatch[0].replace('-', ' ').toLowerCase(); // Adjusted here
+  }
+
+  // If not a Core series, look for other Intel processor series model identifiers (e.g., Pentium G645)
+  const otherModelMatch = model.match(
+    /\b(G\d{3,4}|J\d{3,4}|N\d{3,4}|E\d{3,4}|Q\d{3,4}|D\d{3,4})\b/gi,
+  );
+
+  // Return the first match found, formatted as required, or an empty string if no match
+  return otherModelMatch && otherModelMatch.length > 0
+    ? otherModelMatch[0].toLowerCase().replace('-', ' ') // Ensure consistent formatting
+    : '';
+}
+
+/**
+ * @param name - "커피I7 8700K"
+ * @returns normalizedCpuModelName - "i7 8700k"
+ */
 export function normalizeIntelCpuName(name: string): string {
   return name
     .replace(

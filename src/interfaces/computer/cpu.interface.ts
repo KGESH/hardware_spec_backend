@@ -1,6 +1,8 @@
 import { IHardware } from './hardware.interface';
 import { IAIEstimate } from '../ai/aiAnswer.interface';
 
+export type ICpuVendor = 'intel' | 'amd';
+
 export type ICpu = IHardware & {
   type: 'CPU';
   coreCount: number;
@@ -9,7 +11,7 @@ export type ICpu = IHardware & {
   boostClock: number | null;
 };
 
-export type ICpuCreate = Omit<ICpu, 'id' | 'type'>;
+export type ICpuCreate = Omit<ICpu, 'id' | 'type' | 'normalizedHwKey'>;
 
 export type ICpuQuery = Pick<ICpu, 'hwKey'>;
 

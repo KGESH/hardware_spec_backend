@@ -8,6 +8,7 @@ import {
   ICpuCreate,
   ICpuQuery,
 } from '../../interfaces/computer/cpu.interface';
+
 @Injectable()
 export class CpuRepository extends BaseRepository<cpu, ICpu> {
   private readonly logger = new Logger(CpuRepository.name);
@@ -21,6 +22,7 @@ export class CpuRepository extends BaseRepository<cpu, ICpu> {
       id: entity.id,
       type: 'CPU',
       hwKey: entity.hw_key,
+      normalizedHwKey: entity.normalized_hw_key,
       displayName: entity.model_name, // Todo: check display name
       vendorName: entity.vendor,
       coreCount: entity.core_count,
@@ -35,21 +37,19 @@ export class CpuRepository extends BaseRepository<cpu, ICpu> {
       const cpu = await this.prisma.cpu.findUniqueOrThrow({
         where: { hw_key: query.hwKey },
       });
-
-      this.logger.debug(cpu);
-
       return this._transform(cpu);
     } catch (e) {
       return this._handlePrismaNotFoundError(e, `CPU not found.`);
     }
   }
 
-  async create(dto: ICpuCreate): Promise<ICpu> {
+  async create(dto: ICpuCreate, normalizedHwKey: string): Promise<ICpu> {
     try {
       const cpu = await this.prisma.cpu.create({
         data: {
           id: uuidV4(),
           hw_key: dto.hwKey,
+          normalized_hw_key: normalizedHwKey,
           model_name: dto.displayName,
           vendor: dto.vendorName,
           core_count: dto.coreCount,
@@ -64,7 +64,10 @@ export class CpuRepository extends BaseRepository<cpu, ICpu> {
     }
   }
 
-  async createIfNotExist(dto: ICpuCreate): Promise<ICpu> {
+  async createIfNotExist(
+    dto: ICpuCreate,
+    normalizedHwKey: string,
+  ): Promise<ICpu> {
     try {
       const cpu = await this.prisma.cpu.upsert({
         where: { hw_key: dto.hwKey },
@@ -72,6 +75,7 @@ export class CpuRepository extends BaseRepository<cpu, ICpu> {
         create: {
           id: uuidV4(),
           hw_key: dto.hwKey,
+          normalized_hw_key: normalizedHwKey,
           model_name: dto.displayName,
           vendor: dto.vendorName,
           core_count: dto.coreCount,
