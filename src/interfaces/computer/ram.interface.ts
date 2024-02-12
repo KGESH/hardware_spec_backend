@@ -3,7 +3,7 @@ import { IAIEstimate } from '../ai/aiAnswer.interface';
 
 export type IRam = IHardware;
 
-export type IRamCreate = Omit<IRam, 'id' | 'type'>;
+export type IRamCreate = Omit<IRam, 'id' | 'type' | 'normalizedHwKey'>;
 
 export type IRamQuery = Pick<IRam, 'hwKey'>;
 

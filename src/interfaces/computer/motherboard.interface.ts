@@ -5,7 +5,10 @@ export type IMotherboard = IHardware & {
   chipset: string;
 };
 
-export type IMotherboardCreate = Omit<IMotherboard, 'id' | 'type'>;
+export type IMotherboardCreate = Omit<
+  IMotherboard,
+  'id' | 'type' | 'normalizedHwKey'
+>;
 
 export type IMotherboardQuery = Pick<IMotherboard, 'hwKey'>;
 

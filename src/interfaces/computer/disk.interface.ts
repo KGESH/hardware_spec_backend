@@ -8,7 +8,7 @@ export type IDisk = IHardware & {
   totalSpace: number;
 };
 
-export type IDiskCreate = Omit<IDisk, 'id' | 'type'>;
+export type IDiskCreate = Omit<IDisk, 'id' | 'type' | 'normalizedHwKey'>;
 
 export type IDiskQuery = Pick<IDisk, 'hwKey'>;
 
