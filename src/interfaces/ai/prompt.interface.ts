@@ -7,9 +7,12 @@ export type IPromptCache = {
 
 export type ISystemPrompt = string;
 
-export type IHardwarePrompt = string;
+export type IPromptInput = string;
+
+export type INormalizePromptTemplate = string;
 
 export type IEstimatePrompt = {
-  system: ISystemPrompt;
-  hardwareSpec: IHardwarePrompt;
+  systemPromptTemplate: ISystemPrompt;
+  normalizePromptTemplate: INormalizePromptTemplate;
+  input: IPromptInput;
 };

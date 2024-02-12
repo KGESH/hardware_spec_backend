@@ -5,18 +5,29 @@ import {
   IPromptCache,
   IEstimatePrompt,
   ISystemPrompt,
+  INormalizePromptTemplate,
 } from '../../interfaces/ai/prompt.interface';
 import { PricingTableService } from './pricingTable.service';
-import { EntityNotfoundException } from '../../exceptions/entityNotfound.exception';
 import { UnknownException } from '../../exceptions/unknown.exception';
-import { IHardware } from '../../interfaces/computer/hardware.interface';
+import {
+  IHardware,
+  IHardwareType,
+} from '../../interfaces/computer/hardware.interface';
 import { ICpu } from '../../interfaces/computer/cpu.interface';
 import { IDisk } from '../../interfaces/computer/disk.interface';
 import { IGpu } from '../../interfaces/computer/gpu.interface';
 import { IMotherboard } from '../../interfaces/computer/motherboard.interface';
 import { IRam } from '../../interfaces/computer/ram.interface';
-import { IPricingTable } from '../../interfaces/shop/pricingTable.interface';
-import { AI_SAMPLE_COMPUTER_PROMPT } from '../../constants/ai.constants';
+import {
+  AI_PROMPT_CELERON_SERIES_NORMALIZE_TEMPLATE,
+  AI_PROMPT_INTEL_CORE_SERIES_NORMALIZE_TEMPLATE,
+  AI_PROMPT_PENTIUM_SERIES_NORMALIZE_TEMPLATE,
+  AI_PROMPT_RYZEN_SERIES_NORMALIZE_TEMPLATE,
+  AI_PROMPT_SYSTEM_TEMPLATE,
+} from '../../constants/prompt.constants';
+import { checkCpuVendorByModelName } from '../../utils/brand/cpu/commonCpu.util';
+import { getIntelBrand } from '../../utils/brand/cpu/intelCpu.util';
+import { getAmdBrand } from '../../utils/brand/cpu/amdCpu.util';
 
 @Injectable()
 export class PromptService {
@@ -27,52 +38,137 @@ export class PromptService {
     private readonly redisService: RedisService,
   ) {}
 
-  async buildPrompt(
-    shopId: string,
-    hardware: IHardware,
-  ): Promise<IEstimatePrompt> {
-    const pricingTable = await this.pricingTableService.findPricingTable({
-      shopId,
-      type: hardware.type,
-    });
+  buildPrompt(hardware: IHardware): IEstimatePrompt {
+    const systemPromptTemplate = this._buildSystemPromptTemplate(hardware.type);
+    const normalizePromptTemplate =
+      this._buildNormalizePromptTemplate(hardware);
+    const input = this._buildHardwareQueryInput(hardware);
 
-    // Todo: crawling pricing table
-
-    if (!pricingTable) {
-      throw new EntityNotfoundException({ message: `Pricing table not found` });
-    }
-
-    const systemPrompt = this._buildSystemPrompt(pricingTable);
-
-    const query = this._buildHardwareSpecPrompt(hardware);
-
+    this.logger.debug(systemPromptTemplate, normalizePromptTemplate, input);
     return {
-      system: systemPrompt,
-      hardwareSpec: query,
+      systemPromptTemplate,
+      normalizePromptTemplate,
+      input,
     };
   }
 
-  private _buildSystemPrompt(pricingTable: IPricingTable): ISystemPrompt {
-    // Todo: fetch from DB
-    const baseSystemPrompt = AI_SAMPLE_COMPUTER_PROMPT;
+  private _buildNormalizePromptTemplate(
+    hardware: IHardware,
+  ): INormalizePromptTemplate {
+    switch (hardware.type) {
+      case 'CPU':
+        return this._buildNormalizeCpuPromptTemplate(hardware as ICpu);
+      case 'GPU':
+      case 'MB':
+      case 'RAM':
+      case 'DISK':
+      case 'OTHER':
+      default:
+        throw new UnknownException({
+          message: 'TODO: IMPLEMENT NORMALIZE PROMPT',
+        });
+    }
+  }
 
+  private _buildNormalizeCpuPromptTemplate(
+    cpu: ICpu,
+  ): INormalizePromptTemplate {
+    const vendor = checkCpuVendorByModelName(cpu.hwKey);
+
+    if (vendor === 'intel') {
+      const intelBrand = getIntelBrand(cpu.hwKey);
+      switch (intelBrand) {
+        case 'core':
+          return AI_PROMPT_INTEL_CORE_SERIES_NORMALIZE_TEMPLATE;
+        case 'pentium':
+          return AI_PROMPT_PENTIUM_SERIES_NORMALIZE_TEMPLATE;
+        case 'celeron':
+          return AI_PROMPT_CELERON_SERIES_NORMALIZE_TEMPLATE;
+      }
+    } else {
+      const amdBrand = getAmdBrand(cpu.hwKey);
+      switch (amdBrand) {
+        case 'ryzen':
+          return AI_PROMPT_RYZEN_SERIES_NORMALIZE_TEMPLATE;
+        case 'amd':
+        default:
+          throw new UnknownException({ message: 'TODO: IMPLEMENT AMD BRAND' });
+      }
+    }
+  }
+
+  private _buildSystemPromptTemplate(type: IHardwareType): ISystemPrompt {
+    switch (type) {
+      case 'CPU':
+        return AI_PROMPT_SYSTEM_TEMPLATE('CPU');
+      case 'GPU':
+        return AI_PROMPT_SYSTEM_TEMPLATE('GPU');
+      case 'MB':
+        return AI_PROMPT_SYSTEM_TEMPLATE('Motherboard');
+      case 'RAM':
+        return AI_PROMPT_SYSTEM_TEMPLATE('RAM');
+      case 'DISK':
+        return AI_PROMPT_SYSTEM_TEMPLATE('Disk');
+      default:
+        throw new UnknownException({
+          message: 'Unknown hardware type. buildSystemPrompt',
+        });
+    }
+    // Todo: fetch from DB
+    // const baseSystemPrompt = AI_SAMPLE_COMPUTER_PROMPT;
+    //
+    // const isCpuPricing =
+    //   typia.validate<IHardwareWithPricing<ICpuDataset>[]>(pricingRows);
+    // if (isCpuPricing.success) {
+    //   const cpuPricingTable = isCpuPricing.data
+    //     .map((row) => {
+    //       return `[ ${row.type} | ${row.hardware.vendor} | ${row.hardware.category} | ${row.hardware.normalizedHwKey} | ${row.price} ]`;
+    //     })
+    //     .join('\n');
+    //
+    //   return this._buildPrompt(baseSystemPrompt, cpuPricingTable);
+    // }
+    //
+    // // Todo: remove
+    // return '';
+
+    // const isGpuPricing = typia.validate<IHardwareWithPricing<IGpuDataset>[]>(pricingRows);
+    // if (isGpuPricing.success) {
+    //   const gpuPricingTable = isGpuPricing.data
+    //     .map((row) => {
+    //       return `[ ${row.type} | ${row.hardware.vendor} | ${row.hardware.category} | ${row.hardware.normalizedHwKey} | ${row.price} ]`;
+    //     })
+    //     .join('\n');
+    //
+    //   return this._buildPrompt(baseSystemPrompt, gpuPricingTable);
+    // }
+  }
+
+  private _buildPrompt(
+    baseSystemPrompt: string,
+    cpuPricingTable: string,
+  ): ISystemPrompt {
     const systemPrompt = baseSystemPrompt
       .concat('\n\n')
-      .concat(`Here's the pricing table for ${pricingTable.type}.\n\n`)
-      .concat(pricingTable.sheets);
-
+      .concat(`Here's the pricing table.\n`)
+      .concat('=========================\n')
+      .concat(cpuPricingTable)
+      .concat('\n')
+      .concat('=========================\n');
     return systemPrompt;
   }
 
-  private _buildHardwareSpecPrompt(hardware: IHardware): string {
+  private _buildHardwareQueryInput(hardware: IHardware): string {
     switch (hardware.type) {
       case 'CPU':
-        const cpu = hardware as ICpu;
-        return `${cpu.displayName}`
-          .concat(cpu?.coreCount ? ` / ${cpu.coreCount} cores` : '')
-          .concat(cpu?.threadCount ? ` / ${cpu.threadCount} threads` : '')
-          .concat(cpu?.baseClock ? ` / ${cpu.baseClock} GHz` : '')
-          .concat(cpu?.boostClock ? `@ ${cpu.boostClock} GHz` : '');
+        return hardware.hwKey;
+      // const cpu = hardware as ICpu;
+      // return `${cpu.vendorName} | ${cpu.displayName}`;
+      // return `${cpu.displayName}`
+      //   .concat(cpu?.coreCount ? ` / ${cpu.coreCount} cores` : '')
+      //   .concat(cpu?.threadCount ? ` / ${cpu.threadCount} threads` : '')
+      //   .concat(cpu?.baseClock ? ` / ${cpu.baseClock} GHz` : '')
+      //   .concat(cpu?.boostClock ? `@ ${cpu.boostClock} GHz` : '');
 
       case 'GPU':
         const gpu = hardware as IGpu;
@@ -97,7 +193,7 @@ export class PromptService {
           .concat(disk?.totalSpace ? ` / ${disk.totalSpace}` : '');
 
       default:
-        throw new UnknownException('buildPromptQueryForHardware');
+        throw new UnknownException({ message: 'buildPromptQueryForHardware' });
     }
   }
   async cachePrompt({ shopId, prompt }: IPromptCache): Promise<boolean> {

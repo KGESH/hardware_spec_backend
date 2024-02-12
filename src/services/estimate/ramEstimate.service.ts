@@ -33,7 +33,8 @@ export class RamEstimateService {
 
     const ramSpec = typia.validate<IRam>(dto.hardware);
 
-    if (!ramSpec.success) throw new UnknownException('Invalid RAM Spec');
+    if (!ramSpec.success)
+      throw new UnknownException({ message: 'Invalid RAM Spec' });
 
     const ram = await this.ramService.createIfNotExists(ramSpec.data);
 

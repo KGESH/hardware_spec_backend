@@ -12,6 +12,7 @@ import { IAIResponse } from '../../interfaces/ai/aiAnswer.interface';
 import { ICurrency } from '../../interfaces/common.interface';
 import { AIEstimateResponseDto } from '../../dtos/estimate/estimate.dto';
 import { PromptService } from '../shop/prompt.service';
+import { VectorStoreService } from '../ai/vectorStore.service';
 
 @Injectable()
 export class EstimateAIService {
@@ -21,6 +22,7 @@ export class EstimateAIService {
     private readonly langChainService: LangChainService,
     private readonly estimateService: EstimateService,
     private readonly promptService: PromptService,
+    private readonly vectorStoreService: VectorStoreService,
   ) {}
 
   async cacheEstimateStatus(response: AIEstimateResponseDto) {
@@ -63,12 +65,11 @@ export class EstimateAIService {
         continue;
       }
       estimatePromises.push(
-        this._requestEstimateFromAI({ shopId, estimateId, hardware, currency }),
+        this._requestEstimateToAI({ shopId, estimateId, hardware, currency }),
       );
     }
 
     const aiResponsePromises = await Promise.allSettled(estimatePromises);
-
     const aiResponses = aiResponsePromises
       .filter((promise) => {
         if (promise.status === 'fulfilled') return promise;
@@ -76,24 +77,25 @@ export class EstimateAIService {
       })
       .map((p) => (p as PromiseFulfilledResult<IPartEstimate>).value);
 
-    // return response;
     return [...cachedEstimates, ...aiResponses];
   }
 
-  private async _requestEstimateFromAI({
+  private async _requestEstimateToAI({
     shopId,
     hardware,
     currency,
     estimateId,
   }: Omit<IPartEstimateCreate, 'aiResponse'>): Promise<IPartEstimate> {
-    const estimatePrompt = await this.promptService.buildPrompt(
-      shopId,
+    const estimatePrompt = this.promptService.buildPrompt(
+      // shopId,
       hardware,
     );
+    const vectorStore = this.vectorStoreService.getVectorStore(hardware);
 
     return this.langChainService
       .chatToAI<IAIResponse>({
-        estimatePrompt: estimatePrompt,
+        estimatePrompt,
+        vectorStore,
         responseSchema: aiAnswerSchema,
       })
       .then((aiAnswer) => {
@@ -106,50 +108,4 @@ export class EstimateAIService {
         });
       });
   }
-
-  // private async _buildPrompt(
-  //   shopId: string,
-  //   hardware: IHardware,
-  // ): Promise<IQueryPrompt> {
-  //   return this.promptService.buildPrompt(shopId, hardware);
-  // }
-  //
-  // private _buildHardwareSpecPrompt(hardware: HardwareDto): string {
-  //   // Construct and return the query string based on the specific hardware type and attributes
-  //
-  //   switch (hardware.type) {
-  //     case 'CPU':
-  //       const cpu = hardware as CpuDto;
-  //       return `${cpu.displayName}`
-  //         .concat(cpu?.coreCount ? ` / ${cpu.coreCount} cores` : '')
-  //         .concat(cpu?.threadCount ? ` / ${cpu.threadCount} threads` : '')
-  //         .concat(cpu?.baseClock ? ` / ${cpu.baseClock} GHz` : '')
-  //         .concat(cpu?.boostClock ? `@ ${cpu.boostClock} GHz` : '');
-  //
-  //     case 'GPU':
-  //       const gpu = hardware as GpuDto;
-  //       return `${gpu.displayName} / ${gpu.vendorName}`.concat(
-  //         gpu?.subVendorName ? ` / ${gpu.subVendorName}` : '',
-  //       );
-  //
-  //     case 'MB':
-  //       const motherboard = hardware as MotherboardDto;
-  //       return `${motherboard.displayName}`
-  //         .concat(motherboard?.vendorName ? ` / ${motherboard.vendorName}` : '')
-  //         .concat(motherboard?.chipset ? ` / ${motherboard.chipset}` : '');
-  //
-  //     case 'RAM':
-  //       const ram = hardware as RamDto;
-  //       return `${ram.displayName} / ${ram.vendorName}`;
-  //
-  //     case 'DISK':
-  //       const disk = hardware as DiskDto;
-  //       return `${disk.displayName} / ${disk.vendorName}`
-  //         .concat(disk?.kind ? ` / ${disk.kind}` : '')
-  //         .concat(disk?.totalSpace ? ` / ${disk.totalSpace}` : '');
-  //
-  //     default:
-  //       throw new UnknownException('buildPromptQueryForHardware');
-  //   }
-  // }
 }

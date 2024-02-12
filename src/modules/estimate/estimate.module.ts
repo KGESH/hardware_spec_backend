@@ -19,19 +19,22 @@ import { MotherboardEstimateRepository } from '../../repositories/estimate/mothe
 import { RamEstimateRepository } from '../../repositories/estimate/ramEstimate.repository';
 import { DiskEstimateRepository } from '../../repositories/estimate/diskEstimate.repository';
 import { ShopModule } from '../shop/shop.module';
-import { PromptService } from '../../services/shop/prompt.service';
+import { EstimateAIService } from '../../services/estimate/estimateAI.service';
+import { PricingTableModule } from '../shop/pricingTable.module';
 
 @Module({
   imports: [
     PrismaModule,
     RedisModule,
     EventPublishModule,
+    PricingTableModule,
     ComputerModule,
     AIModule,
     ShopModule,
   ],
   controllers: [EstimateController],
   providers: [
+    EstimateAIService,
     EstimateService,
     EstimateRepository,
     EstimatePartService,
@@ -46,6 +49,6 @@ import { PromptService } from '../../services/shop/prompt.service';
     DiskEstimateService,
     DiskEstimateRepository,
   ],
-  exports: [EstimateService, AIModule, ComputerModule],
+  exports: [EstimateAIService, EstimateService, AIModule, ComputerModule],
 })
 export class EstimateModule {}

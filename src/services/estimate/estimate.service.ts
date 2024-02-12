@@ -74,8 +74,9 @@ export class EstimateService {
     this.logger.verbose(`Update estimate`, dto);
     const found = await this.findBy(dto);
 
-    if (!found)
+    if (!found) {
       throw new EntityNotfoundException({ message: 'Estimate not found.' });
+    }
 
     return await this.estimateRepository.update(dto);
   }

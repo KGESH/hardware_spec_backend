@@ -39,7 +39,8 @@ export class ConfigsService {
       REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
       REDIS_URI: `redis://:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
       GOOGLE_API_KEY: process.env.GOOGLE_API_KEY as string,
-      VECTOR_STORE_URL: process.env.VECTOR_STORE_URL as string,
+      PINECONE_VECTOR_STORE_API_KEY: process.env
+        .PINECONE_VECTOR_STORE_API_KEY as string,
       KOREA_CRAWLING_BASE_URL: process.env.KOREA_CRAWLING_BASE_URL as string,
     };
 
@@ -67,7 +68,9 @@ export class ConfigsService {
       REDIS_PORT: +this.dotEnv.get('REDIS_PORT'),
       REDIS_USERNAME: this.dotEnv.get('REDIS_USERNAME') as string,
       REDIS_PASSWORD: this.dotEnv.get('REDIS_PASSWORD') as string,
-      VECTOR_STORE_URL: this.dotEnv.get('VECTOR_STORE_URL') as string,
+      PINECONE_VECTOR_STORE_API_KEY: this.dotEnv.get(
+        'PINECONE_VECTOR_STORE_API_KEY',
+      ) as string,
       GOOGLE_API_KEY: this.dotEnv.get('GOOGLE_API_KEY') as string,
       KOREA_CRAWLING_BASE_URL: this.dotEnv.get(
         'KOREA_CRAWLING_BASE_URL',

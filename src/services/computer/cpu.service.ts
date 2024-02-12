@@ -4,13 +4,11 @@ import {
   ICpu,
   ICpuCreate,
   ICpuQuery,
-  ICpuVendor,
 } from '../../interfaces/computer/cpu.interface';
 import { IHardware } from '../../interfaces/computer/hardware.interface';
 import { normalizeIntelCpuName } from '../../utils/brand/cpu/intelCpu.util';
 import { normalizeAmdCpuName } from '../../utils/brand/cpu/amdCpu.util';
-import { UnknownException } from '../../exceptions/unknown.exception';
-import * as typia from 'typia';
+import { checkCpuVendor } from '../../utils/brand/cpu/commonCpu.util';
 
 @Injectable()
 export class CpuService {
@@ -38,7 +36,7 @@ export class CpuService {
     dto: ICpuCreate,
   ): Pick<IHardware, 'normalizedHwKey'> {
     let normalizedHwKey: string;
-    const vendor = this._checkCpuVendor(dto.vendorName);
+    const vendor = checkCpuVendor(dto.vendorName);
 
     switch (vendor) {
       case 'intel':
@@ -50,21 +48,5 @@ export class CpuService {
     }
 
     return { normalizedHwKey };
-  }
-
-  private _checkCpuVendor(vendorName: string): ICpuVendor {
-    const vendor = vendorName.toLowerCase();
-    const isIntel = typia.is<'intel'>(vendor);
-    const isAmd = typia.is<'amd'>(vendor);
-
-    if (!isIntel && !isAmd) {
-      throw new UnknownException({ message: `Unknown CPU vendor: ${vendor}` });
-    }
-
-    if (isIntel) {
-      return 'intel';
-    } else {
-      return 'amd';
-    }
   }
 }

@@ -1,3 +1,5 @@
+import { UnknownException } from '../../../exceptions/unknown.exception';
+
 type Ryzen = {
   isRyzen: true;
   normalizedCategory: string;
@@ -13,6 +15,20 @@ type NonRyzen = {
 };
 
 type AmdCpu = Ryzen | NonRyzen;
+
+type AmdSeries = 'ryzen' | 'amd';
+
+export function getAmdBrand(model: string): AmdSeries {
+  if (isRyzenSeries(model)) {
+    return 'ryzen';
+  } else {
+    return 'amd';
+  }
+}
+
+export function isRyzenSeries(model: string): boolean {
+  return model.toLowerCase().includes('ryzen');
+}
 
 export function normalizeAmdCpuName(name: string): string {
   // Attempt to match Ryzen pattern first
@@ -59,7 +75,7 @@ export function normalizeAmdCpu({
   const normalizedName = normalizeAmdCpuName(name);
 
   // Determine if it's Ryzen based on the presence of "ryzen" in the normalized name
-  const isRyzen = normalizedName.startsWith('ryzen');
+  const isRyzen = normalizedName.includes('ryzen');
 
   return {
     isRyzen,

@@ -1,7 +1,11 @@
 export const AI_MODEL = 'AI_MODEL';
+
 export const AI_EMBEDDINGS_MODEL = 'AI_EMBEDDINGS_MODEL';
-export const CPU_INTEL_VECTOR_STORE = 'CPU_INTEL_VECTOR_STORE';
-export const CPU_AMD_VECTOR_STORE = 'CPU_AMD_VECTOR_STORE';
+
+export const CPU_INTEL_VECTOR_STORE = 'cpu-intel-vector-store';
+
+export const CPU_AMD_VECTOR_STORE = 'cpu-amd-vector-store';
+
 export const AI_MODEL_NAME = 'gemini-pro';
 
 export const AI_EMBEDDING_MODEL_NAME = 'embedding-001';

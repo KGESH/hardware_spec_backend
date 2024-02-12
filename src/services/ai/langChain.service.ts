@@ -1,12 +1,19 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { StructuredOutputParser } from 'langchain/output_parsers';
 import { AI_MODEL } from '../../constants/ai.constants';
 import { z } from 'zod';
 import { UnknownException } from '../../exceptions/unknown.exception';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { RunnableSequence } from '@langchain/core/runnables';
+import { ChatPromptTemplate, PromptTemplate } from '@langchain/core/prompts';
+import {
+  RunnablePassthrough,
+  RunnableSequence,
+} from '@langchain/core/runnables';
 import { IEstimatePrompt } from '../../interfaces/ai/prompt.interface';
+import { AI_PROMPT_INPUT_TEMPLATE } from '../../constants/prompt.constants';
+import { StringOutputParser } from '@langchain/core/output_parsers';
+import { VectorStore } from '@langchain/core/vectorstores';
+import { formatDocumentsAsString } from 'langchain/util/document';
+import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 
 @Injectable()
 export class LangChainService {
@@ -14,29 +21,46 @@ export class LangChainService {
 
   constructor(
     @Inject(AI_MODEL)
-    private readonly aiModel: ChatGoogleGenerativeAI,
+    private readonly aiModel: BaseChatModel,
   ) {}
 
   async chatToAI<T>({
     estimatePrompt,
     responseSchema,
+    vectorStore,
   }: {
     estimatePrompt: IEstimatePrompt;
     responseSchema: z.ZodSchema<T>;
+    vectorStore: VectorStore;
   }): Promise<z.infer<typeof responseSchema>> {
     const parser = StructuredOutputParser.fromZodSchema(responseSchema);
-    const prompt = ChatPromptTemplate.fromMessages<{
-      query: string;
-    }>([
-      ['system', estimatePrompt.system],
-      ['human', '{query}'],
+    const prompt = ChatPromptTemplate.fromMessages<{ input: string }>([
+      ['system', estimatePrompt.systemPromptTemplate],
+      ['human', AI_PROMPT_INPUT_TEMPLATE],
     ]);
+    const normalizeModelNamePrompt = PromptTemplate.fromTemplate(
+      estimatePrompt.normalizePromptTemplate,
+    );
+    const normalizeNameChain = normalizeModelNamePrompt
+      .pipe(this.aiModel)
+      .pipe(new StringOutputParser());
 
-    const chain = RunnableSequence.from([prompt, this.aiModel, parser]);
+    const chain = RunnableSequence.from([
+      normalizeNameChain,
+      {
+        input: new RunnablePassthrough(),
+        context: vectorStore
+          .asRetriever({ k: 10, searchType: 'similarity' })
+          .pipe(formatDocumentsAsString),
+      },
+      prompt,
+      this.aiModel,
+      parser,
+    ]);
 
     try {
       const aiResponse = await chain.invoke({
-        query: estimatePrompt.hardwareSpec,
+        input: estimatePrompt.input,
       });
       this.logger.verbose(`CREATED AI RESPONSE`, aiResponse);
 

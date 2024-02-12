@@ -20,6 +20,7 @@ export type EstimateCacheDto = {
 export type EstimateRequestDto = {
   shopId: string & tags.Format<'uuid'>;
   estimateId: string & tags.Format<'uuid'>;
+  encodedId: string;
   computer: ComputerDto;
 };
 

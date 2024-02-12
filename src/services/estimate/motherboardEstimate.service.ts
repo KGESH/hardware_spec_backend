@@ -37,7 +37,7 @@ export class MotherboardEstimateService {
     const motherboardSpec = typia.validate<IMotherboard>(dto.hardware);
 
     if (!motherboardSpec.success)
-      throw new UnknownException('Invalid M/B Spec');
+      throw new UnknownException({ message: 'Invalid M/B Spec' });
 
     const motherboard = await this.motherboardService.createIfNotExists(
       motherboardSpec.data,

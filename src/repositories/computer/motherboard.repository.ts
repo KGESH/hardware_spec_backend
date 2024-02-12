@@ -25,6 +25,7 @@ export class MotherboardRepository extends BaseRepository<
       id: entity.id,
       type: 'MB',
       hwKey: entity.hw_key,
+      normalizedHwKey: entity.hw_key,
       chipset: entity.chipset,
       displayName: entity.model_name, // Todo: check display name
       vendorName: entity.vendor,

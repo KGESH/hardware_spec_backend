@@ -18,6 +18,6 @@ export function getCurrency(country: ICountry): ICurrency {
       return 'CNY';
 
     default:
-      throw new UnknownException('Invalid country');
+      throw new UnknownException({ message: 'Invalid country', data: country });
   }
 }

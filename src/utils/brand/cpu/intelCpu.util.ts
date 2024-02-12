@@ -1,8 +1,38 @@
+import { UnknownException } from '../../../exceptions/unknown.exception';
+
 type IntelCpu = {
   normalizedCategory: string; // e.g., "10th"
   normalizedName: string; // e.g., "I9 10900K"
   normalizedPrice: number; // e.g., 1000000
 };
+
+type IntelSeries = 'core' | 'pentium' | 'celeron';
+
+export function getIntelBrand(model: string): IntelSeries {
+  if (isCoreSeries(model)) {
+    return 'core';
+  } else if (isPentiumSeries(model)) {
+    return 'pentium';
+  } else if (isCeleronSeries(model)) {
+    return 'celeron';
+  } else {
+    throw new UnknownException({
+      message: `Unknown Intel CPU series: ${model}`,
+    });
+  }
+}
+
+export function isCoreSeries(model: string): boolean {
+  return model.toLowerCase().includes('core');
+}
+
+export function isPentiumSeries(model: string): boolean {
+  return model.toLowerCase().includes('pentium');
+}
+
+export function isCeleronSeries(model: string): boolean {
+  return model.toLowerCase().includes('celeron');
+}
 
 /**
  * @param model - "Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz"

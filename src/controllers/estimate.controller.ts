@@ -30,14 +30,6 @@ export class EstimateController {
     this.devShopId = this.configService.env.DEBUG_SHOP_ID;
   }
 
-  @TypedRoute.Get('/')
-  async debugRedisPub() {
-    this.logger.verbose(`sampleRedisPub`);
-    return await this.eventPublishService.emit(ESTIMATE_CREATE_EVENT, {
-      test: 'test',
-    });
-  }
-
   @TypedRoute.Get('/:estimateId')
   async getEstimate(
     @TypedParam('estimateId') estimateId: string,
@@ -94,6 +86,7 @@ export class EstimateController {
     const aiRequestDto: EstimateRequestDto = {
       shopId: this.devShopId, // Todo: replace to real shopId
       estimateId: estimate.id,
+      encodedId,
       computer: computerDto,
     };
 
@@ -106,8 +99,6 @@ export class EstimateController {
     });
 
     // Todo: change cache logic. remove encoded Id
-    // Request Estimate from AI.
-    await this.computerService.cacheComputerSpec(encodedId, computerDto);
     await this.eventPublishService.emit(ESTIMATE_CREATE_EVENT, aiRequestDto);
 
     return {

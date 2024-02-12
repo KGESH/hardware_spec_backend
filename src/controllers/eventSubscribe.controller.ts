@@ -3,6 +3,7 @@ import { EventPattern, Payload, Transport } from '@nestjs/microservices';
 import {
   AIEstimatedDto,
   AIEstimateErrorDto,
+  AIEstimateResponseDto,
   EstimateRequestDto,
 } from '../dtos/estimate/estimate.dto';
 import { EstimateAIService } from '../services/estimate/estimateAI.service';
@@ -10,7 +11,7 @@ import { ESTIMATE_CREATE_EVENT } from '../constants/estimate.constant';
 import { ComputerService } from '../services/computer/computer.service';
 import { ShopService } from '../services/shop/shop.service';
 import { EntityNotfoundException } from '../exceptions/entityNotfound.exception';
-import { getCurrency } from '../utils/currency';
+import { getCurrency } from '../utils/currency.util';
 import { EstimateService } from '../services/estimate/estimate.service';
 
 @Controller()
@@ -25,11 +26,14 @@ export class EventSubscribeController {
   ) {}
 
   @EventPattern(ESTIMATE_CREATE_EVENT, Transport.REDIS)
-  async requestEstimate(@Payload() data: EstimateRequestDto): Promise<any> {
+  async requestEstimate(
+    @Payload() data: EstimateRequestDto,
+  ): Promise<AIEstimateResponseDto> {
     this.logger.debug('EventPattern EXTERNAL API REQUEST START', data);
     const { shopId, estimateId } = data;
 
     const computer = await this.computerService.getComputer(data.computer);
+    await this.computerService.cacheComputerSpec(data.encodedId, computer);
     this.logger.debug(computer);
 
     const shop = await this.shopService.findBy({ id: shopId });

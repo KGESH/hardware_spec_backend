@@ -112,7 +112,10 @@ export class EstimatePartService {
         };
 
       default:
-        throw new UnknownException('Unknown hardware type.');
+        throw new UnknownException({
+          message: 'Unknown hardware type.',
+          data: dto,
+        });
     }
   }
 

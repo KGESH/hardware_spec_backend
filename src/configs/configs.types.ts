@@ -13,6 +13,10 @@ type ICacheConfigs = {
   REDIS_PASSWORD?: string; // only production
 };
 
+type IVectoreStoreConfigs = {
+  PINECONE_VECTOR_STORE_API_KEY: string;
+};
+
 type IGoogleAIConfigs = {
   GOOGLE_API_KEY: string;
 };
@@ -28,5 +32,6 @@ type IDebug = {
 export type IEnvironment = IDebug &
   ICacheConfigs &
   IGoogleAIConfigs &
+  IVectoreStoreConfigs &
   ICrawlingConfigs &
   IDatabaseConfigs;
