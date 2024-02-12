@@ -34,7 +34,8 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
     try {
       return this.redis.get(this._combinePrefix({ prefix, key }));
     } catch (e) {
-      throw new UnknownException(e, {
+      throw new UnknownException({
+        e,
         message: 'redis get error',
         data: { prefix, key },
       });
@@ -56,7 +57,8 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
       );
       return saved === 'OK';
     } catch (e) {
-      throw new UnknownException(e, {
+      throw new UnknownException({
+        e,
         message: 'redis set error',
         data: { prefix, key, value },
       });
@@ -71,7 +73,8 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
 
       return JSON.parse(data);
     } catch (e) {
-      throw new UnknownException(e, {
+      throw new UnknownException({
+        e,
         message: 'redis get deserialize error',
         data: { prefix, key },
       });
@@ -93,7 +96,8 @@ export class RedisRepository implements IRedisRepository, OnModuleDestroy {
       );
       return saved === 'OK';
     } catch (e) {
-      throw new UnknownException(e, {
+      throw new UnknownException({
+        e,
         message: 'redis set serialize error',
         data: { prefix, key, value },
       });

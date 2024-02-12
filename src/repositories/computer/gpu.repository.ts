@@ -22,6 +22,7 @@ export class GpuRepository extends BaseRepository<gpu, IGpu> {
       id: entity.id,
       type: 'GPU',
       hwKey: entity.hw_key,
+      normalizedHwKey: entity.hw_key,
       chipset: entity.chipset,
       displayName: entity.model_name, // Todo: check display name
       vendorName: entity.vendor,
@@ -43,12 +44,13 @@ export class GpuRepository extends BaseRepository<gpu, IGpu> {
     }
   }
 
-  async create(dto: IGpuCreate): Promise<IGpu> {
+  async create(dto: IGpuCreate, normalizedHwKey: string): Promise<IGpu> {
     try {
       const gpu = await this.prisma.gpu.create({
         data: {
           id: uuidV4(),
           hw_key: dto.hwKey,
+          normalized_hw_key: normalizedHwKey,
           chipset: dto.chipset,
           model_name: dto.displayName,
           vendor: dto.vendorName,
@@ -61,7 +63,10 @@ export class GpuRepository extends BaseRepository<gpu, IGpu> {
     }
   }
 
-  async createIfNotExist(dto: IGpuCreate): Promise<IGpu> {
+  async createIfNotExist(
+    dto: IGpuCreate,
+    normalizedHwKey: string,
+  ): Promise<IGpu> {
     try {
       const gpu = await this.prisma.gpu.upsert({
         where: { hw_key: dto.hwKey },
@@ -69,6 +74,7 @@ export class GpuRepository extends BaseRepository<gpu, IGpu> {
         create: {
           id: uuidV4(),
           hw_key: dto.hwKey,
+          normalized_hw_key: normalizedHwKey,
           chipset: dto.chipset,
           model_name: dto.displayName,
           vendor: dto.vendorName,

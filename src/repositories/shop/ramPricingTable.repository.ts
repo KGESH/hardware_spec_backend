@@ -72,7 +72,7 @@ export class RamPricingTableRepository extends BaseRepository<
       });
       return this._transform(pricingTable);
     } catch (e) {
-      return this._handlePrismaError(e);
+      return this._handlePrismaError(e, `Pricing Table creation error.`);
     }
   }
 
@@ -88,7 +88,7 @@ export class RamPricingTableRepository extends BaseRepository<
       });
       return this._transform(pricingTable);
     } catch (e) {
-      return this._handlePrismaError(e);
+      return this._handlePrismaError(e, `Pricing Table update error.`);
     }
   }
 }

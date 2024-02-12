@@ -54,11 +54,11 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
     super();
   }
 
-  protected _transform(estimate: estimate): IEstimate {
+  protected _transform(entity: estimate): IEstimate {
     return {
-      id: estimate.id,
-      status: estimate.status,
-      name: estimate.name,
+      id: entity.id,
+      status: entity.status,
+      name: entity.name,
       parts: [],
     };
   }
@@ -75,6 +75,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
             hardware: {
               id: cpuEstimate.cpu.id,
               hwKey: cpuEstimate.cpu.hw_key,
+              normalizedHwKey: cpuEstimate.cpu.normalized_hw_key,
               vendorName: cpuEstimate.cpu.vendor,
               displayName: cpuEstimate.cpu.model_name,
               type: 'CPU' as IHardwareType,
@@ -95,6 +96,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
             hardware: {
               id: gpuEstimate.gpu.id,
               hwKey: gpuEstimate.gpu.hw_key,
+              normalizedHwKey: gpuEstimate.gpu.hw_key, // Todo: replace
               vendorName: gpuEstimate.gpu.vendor,
               displayName: gpuEstimate.gpu.model_name,
               type: 'GPU' as IHardwareType,
@@ -115,6 +117,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
             hardware: {
               id: motherboardEstimate.motherboard.id,
               hwKey: motherboardEstimate.motherboard.hw_key,
+              normalizedHwKey: motherboardEstimate.motherboard.hw_key, // Todo: replace
               vendorName: motherboardEstimate.motherboard.vendor,
               displayName: motherboardEstimate.motherboard.model_name,
               type: 'MB' as IHardwareType,
@@ -135,6 +138,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
             hardware: {
               id: ramEstimate.ram.id,
               hwKey: ramEstimate.ram.hw_key,
+              normalizedHwKey: ramEstimate.ram.hw_key, // Todo: replace
               vendorName: ramEstimate.ram.vendor,
               displayName: ramEstimate.ram.model_name,
               type: 'RAM' as IHardwareType,
@@ -155,6 +159,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
             hardware: {
               id: diskEstimate.disk.id,
               hwKey: diskEstimate.disk.hw_key,
+              normalizedHwKey: diskEstimate.disk.hw_key, // Todo: replace
               vendorName: diskEstimate.disk.vendor,
               displayName: diskEstimate.disk.model_name,
               type: 'DISK' as IHardwareType,
@@ -238,7 +243,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
       const estimates = await this.prisma.estimate.findMany();
       return estimates.map((estimate) => this._transform(estimate));
     } catch (e) {
-      this._handlePrismaError(e);
+      this._handlePrismaError(e, 'Estimates findMany error.');
     }
   }
 
@@ -271,7 +276,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
 
       return this._transform(updated);
     } catch (e) {
-      this._handlePrismaError(e);
+      this._handlePrismaError(e, `Estimate not found.`);
     }
   }
 
@@ -286,7 +291,7 @@ export class EstimateRepository extends BaseRepository<estimate, IEstimate> {
 
       return true;
     } catch (e) {
-      this._handlePrismaError(e);
+      this._handlePrismaError(e, `Estimate not found.`);
     }
   }
 }

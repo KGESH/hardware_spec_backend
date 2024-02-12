@@ -71,7 +71,7 @@ export class DiskPricingTableRepository extends BaseRepository<
       });
       return this._transform(pricingTable);
     } catch (e) {
-      return this._handlePrismaError(e);
+      return this._handlePrismaError(e, `Pricing Table already exists.`);
     }
   }
 
@@ -87,7 +87,7 @@ export class DiskPricingTableRepository extends BaseRepository<
       });
       return this._transform(pricingTable);
     } catch (e) {
-      return this._handlePrismaError(e);
+      return this._handlePrismaError(e, `Pricing Table not found.`);
     }
   }
 }

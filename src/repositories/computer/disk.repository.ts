@@ -24,6 +24,7 @@ export class DiskRepository extends BaseRepository<disk, IDisk> {
       kind: entity.kind,
       totalSpace: Number(entity.total_space),
       hwKey: entity.hw_key,
+      normalizedHwKey: entity.hw_key,
       displayName: entity.model_name, // Todo: check display name
       vendorName: entity.vendor,
     };
@@ -67,7 +68,13 @@ export class DiskRepository extends BaseRepository<disk, IDisk> {
     try {
       const disk = await this.prisma.disk.upsert({
         where: { hw_key: dto.hwKey },
-        update: {},
+        update: {
+          hw_key: dto.hwKey,
+          kind: dto.kind,
+          total_space: dto.totalSpace,
+          model_name: dto.displayName,
+          vendor: dto.vendorName,
+        },
         create: {
           id: uuidV4(),
           hw_key: dto.hwKey,

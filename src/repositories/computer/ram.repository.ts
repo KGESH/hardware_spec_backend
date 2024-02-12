@@ -22,6 +22,7 @@ export class RamRepository extends BaseRepository<ram, IRam> {
       id: entity.id,
       type: 'RAM',
       hwKey: entity.hw_key,
+      normalizedHwKey: entity.hw_key,
       displayName: entity.model_name, // Todo: check display name
       vendorName: entity.vendor,
     };

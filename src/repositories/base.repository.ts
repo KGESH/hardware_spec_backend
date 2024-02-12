@@ -9,7 +9,7 @@ import { EntityConflictException } from '../exceptions/entityConflict.exception'
 export abstract class BaseRepository<Entity, DTO> {
   protected abstract _transform(entity: Entity): DTO;
 
-  protected _handlePrismaError(e: Error | unknown, message?: string): never {
+  protected _handlePrismaError(e: Error, message: string): never {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       switch (e.code) {
         case PRISMA_UNIQUE_CONSTRAINT_FAILED:
@@ -20,21 +20,18 @@ export abstract class BaseRepository<Entity, DTO> {
         // Todo: Add more cases
 
         default:
-          throw new UnknownException(e);
+          throw new UnknownException({ e, message });
       }
     }
 
-    throw new UnknownException(e);
+    throw new UnknownException({ e, message });
   }
 
-  protected _handlePrismaNotFoundError(
-    e: Error | unknown,
-    message?: string,
-  ): null {
+  protected _handlePrismaNotFoundError(e: Error, message?: string): null {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       if (e.code === PRISMA_ENTITY_NOT_FOUND) return null;
     }
 
-    this._handlePrismaError(e, message);
+    this._handlePrismaError(e, message ?? 'Unknown Prisma error');
   }
 }
