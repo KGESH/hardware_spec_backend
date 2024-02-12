@@ -70,6 +70,7 @@ export class ComputerService {
       hardwareComponentPromises,
     );
 
+    // Todo: handle dataset not exist error
     const hardwareComponents = hardwareComponentResults
       .filter((promise) => {
         if (promise.status === 'fulfilled') return promise;
@@ -106,14 +107,12 @@ export class ComputerService {
   async cacheComputerSpec(
     encodedId: string,
     dto: ComputerDto,
-  ): Promise<string> {
-    await this.redisService.setSerialize({
+  ): Promise<boolean> {
+    return this.redisService.setSerialize({
       prefix: REDIS_SYSTEM_INFO_PREFIX,
       key: encodedId,
       value: dto,
     });
-
-    return encodedId;
   }
 
   async getCachedComputerSpec(encodedId: string): Promise<ComputerDto | null> {
