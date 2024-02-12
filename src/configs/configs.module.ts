@@ -6,8 +6,7 @@ import { ConfigsService } from './configs.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath:
-        process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env.dev',
     }),
   ],
   providers: [ConfigsService],

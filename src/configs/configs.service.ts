@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IEnvironment } from './configs.types';
-import { isProduction } from '../utils/production';
+import { isProduction } from '../utils/production.util';
 import { UnknownException } from '../exceptions/unknown.exception';
 import * as typia from 'typia';
 import * as process from 'process';
@@ -39,6 +39,7 @@ export class ConfigsService {
       REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
       REDIS_URI: `redis://:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
       GOOGLE_API_KEY: process.env.GOOGLE_API_KEY as string,
+      VECTOR_STORE_URL: process.env.VECTOR_STORE_URL as string,
       KOREA_CRAWLING_BASE_URL: process.env.KOREA_CRAWLING_BASE_URL as string,
     };
 
@@ -47,13 +48,10 @@ export class ConfigsService {
     if (productionConfigs.success) {
       this._env = productionConfigs.data;
     } else {
-      throw new UnknownException(
-        'ConfigsService production configs load error.',
-        {
-          message: 'Invalid env file',
-          data: productionConfigs.errors,
-        },
-      );
+      throw new UnknownException({
+        message: 'ConfigsService production configs load error.',
+        data: productionConfigs.errors,
+      });
     }
   }
 
@@ -69,6 +67,7 @@ export class ConfigsService {
       REDIS_PORT: +this.dotEnv.get('REDIS_PORT'),
       REDIS_USERNAME: this.dotEnv.get('REDIS_USERNAME') as string,
       REDIS_PASSWORD: this.dotEnv.get('REDIS_PASSWORD') as string,
+      VECTOR_STORE_URL: this.dotEnv.get('VECTOR_STORE_URL') as string,
       GOOGLE_API_KEY: this.dotEnv.get('GOOGLE_API_KEY') as string,
       KOREA_CRAWLING_BASE_URL: this.dotEnv.get(
         'KOREA_CRAWLING_BASE_URL',
@@ -80,8 +79,8 @@ export class ConfigsService {
     if (devConfigs.success) {
       this._env = devConfigs.data;
     } else {
-      throw new UnknownException('ConfigsService dev configs load error.', {
-        message: 'Invalid env file',
+      throw new UnknownException({
+        message: 'ConfigsService dev configs load error.',
         data: devConfigs.errors,
       });
     }
