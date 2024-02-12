@@ -1,21 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigsModule } from '../../../src/configs/configs.module';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
-import { cpu, PrismaClient } from '@prisma/client';
-import { PrismaService } from '../../../src/services/infra/prisma.service';
+import { cpu } from '@prisma/client';
 import { MockCpuHelper } from '../../helpers/random/cpu.helper';
 import {
   ICpu,
   ICpuCreate,
   ICpuQuery,
 } from '../../../src/interfaces/computer/cpu.interface';
-import { mockPrismaEntityNotfoundError } from '../../helpers/exceptions/mockPrisma.exception';
-import { EntityNotfoundException } from '../../../src/exceptions/entityNotfound.exception';
-import {
-  normalizeIntelCpuModel,
-  normalizeIntelCpuName,
-} from '../../../src/utils/brand/cpu/intelCpu.util';
-import { normalizeAmdCpuName } from '../../../src/utils/brand/cpu/amdCpu.util';
+import { normalizeIntelCpuModel } from '../../../src/utils/brand/cpu/intelCpu.util';
 import { CpuService } from '../../../src/services/computer/cpu.service';
 import { CpuRepository } from '../../../src/repositories/computer/cpu.repository';
 

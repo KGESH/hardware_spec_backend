@@ -82,19 +82,15 @@ describe('[Spec] CpuRepository', () => {
         hwKey: '커피I7 8700K',
       };
       const mockCreatedCpu: cpu = {
-        id: MockCpuHelper.randomId(),
+        ...MockCpuHelper.entity(),
         hw_key: createDto.hwKey,
         normalized_hw_key: normalizeIntelCpuName(createDto.hwKey),
         model_name: 'Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz',
         vendor: 'intel',
-        core_count: 6,
-        thread_count: 12,
-        base_clock: null,
-        boost_clock: null,
-        metadata: null,
-        created_at: new Date(),
-        updated_at: new Date(),
-        deleted_at: null,
+        core_count: createDto.coreCount,
+        thread_count: createDto.threadCount,
+        base_clock: createDto.baseClock,
+        boost_clock: createDto.boostClock,
       };
       mockPrismaClient.cpu.create.mockResolvedValue(mockCreatedCpu);
 
@@ -111,19 +107,15 @@ describe('[Spec] CpuRepository', () => {
         hwKey: '라이젠9 라파엘7950X3D',
       };
       const mockCreatedCpu: cpu = {
-        id: MockCpuHelper.randomId(),
+        ...MockCpuHelper.entity(),
         hw_key: createDto.hwKey,
         normalized_hw_key: normalizeAmdCpuName(createDto.hwKey),
         model_name: 'AMD Ryzen™ 9 7950X3D',
         vendor: 'amd',
-        core_count: 6,
-        thread_count: 12,
-        base_clock: null,
-        boost_clock: null,
-        metadata: null,
-        created_at: new Date(),
-        updated_at: new Date(),
-        deleted_at: null,
+        core_count: createDto.coreCount,
+        thread_count: createDto.threadCount,
+        base_clock: createDto.baseClock,
+        boost_clock: createDto.boostClock,
       };
       mockPrismaClient.cpu.create.mockResolvedValue(mockCreatedCpu);
 

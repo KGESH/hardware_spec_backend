@@ -1,22 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigModule } from '@nestjs/config';
 import { redisFactory } from '../../../src/modules/infra/redis.module';
 import { IRedisRepository } from '../../../src/interfaces/infra/redis.repository.interface';
 import { v4 as uuidV4 } from 'uuid';
 import { REDIS } from '../../../src/constants/redis.constant';
 import { RedisRepository } from '../../../src/repositories/infra/redis.repository';
 import { Redis } from 'ioredis';
+import { ConfigsModule } from '../../../src/configs/configs.module';
 
 describe('[Spec] RedisRepository', () => {
   let redisRepository: RedisRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          envFilePath: '.env.test',
-        }),
-      ],
+      imports: [ConfigsModule],
       providers: [
         redisFactory,
         {

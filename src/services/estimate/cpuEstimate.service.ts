@@ -24,7 +24,7 @@ export class CpuEstimateService {
     cpuEstimate: ICpuEstimate;
   }> {
     const aiAnswer = await this.aiRepository.create({
-      name: dto.hardware.displayName,
+      name: dto.aiResponse.name,
       tablePrice: dto.aiResponse.tablePrice,
       buyingPrice: dto.aiResponse.buyingPrice,
       currency: dto.currency,
@@ -33,7 +33,8 @@ export class CpuEstimateService {
 
     const cpuSpec = typia.validate<ICpu>(dto.hardware);
 
-    if (!cpuSpec.success) throw new UnknownException('Invalid CPU Spec');
+    if (!cpuSpec.success)
+      throw new UnknownException({ message: 'Invalid CPU Spec' });
 
     const cpu = await this.cpuService.createIfNotExists(cpuSpec.data);
 

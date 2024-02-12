@@ -1,6 +1,6 @@
 import { normalizeIntelCpuName } from '../../../src/utils/brand/cpu/intelCpu.util';
 import {
-  checkCpuVendor,
+  checkCpuVendorByModelName,
   isAmdCpu,
   isIntelCpu,
 } from '../../../src/utils/brand/cpu/commonCpu.util';
@@ -13,7 +13,7 @@ describe('[Spec] Cpu Utils', () => {
         const model = 'Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz';
         const expectVendor: ICpuVendor = 'intel';
 
-        const vendor = checkCpuVendor(model);
+        const vendor = checkCpuVendorByModelName(model);
 
         expect(vendor).toEqual(expectVendor);
       });
@@ -42,7 +42,7 @@ describe('[Spec] Cpu Utils', () => {
         const model = 'AMD Ryzen 7 5800X 8-Core Processor';
         const expectVendor: ICpuVendor = 'amd';
 
-        const vendor = checkCpuVendor(model);
+        const vendor = checkCpuVendorByModelName(model);
 
         expect(vendor).toEqual(expectVendor);
       });
