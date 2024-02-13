@@ -33,7 +33,8 @@ export class DiskEstimateService {
 
     const diskSpec = typia.validate<IDisk>(dto.hardware);
 
-    if (!diskSpec.success) throw new UnknownException('Invalid DISK Spec');
+    if (!diskSpec.success)
+      throw new UnknownException({ message: 'Invalid Disk Spec' });
 
     const disk = await this.diskService.createIfNotExists(diskSpec.data);
 
