@@ -17,25 +17,18 @@ export class CpuVectorStoreService {
   private readonly logger = new Logger(CpuVectorStoreService.name);
 
   constructor(
-    // @Inject(CPU_INTEL_VECTOR_STORE)
-    // private readonly cpuIntelVectorStore: VectorStore,
-    // @Inject(CPU_AMD_VECTOR_STORE)
-    // private readonly cpuAmdVectorStore: VectorStore,
     @Inject(AI_EMBEDDINGS_MODEL)
     private readonly embeddings: EmbeddingsInterface,
     private readonly vectorStoreSourceService: VectorStoreSourceService,
   ) {}
 
-  getCpuVectorStore(
-    cpu: Pick<ICpu, 'vendorName'>,
-    shopId: string,
-  ): Promise<VectorStore> {
+  getCpuVectorStore(cpu: Pick<ICpu, 'vendorName'>): Promise<VectorStore> {
     const vendor = checkCpuVendor(cpu.vendorName);
     switch (vendor) {
       case 'intel':
-        return this.getVectorStore(CPU_INTEL_VECTOR_STORE, shopId);
+        return this.getVectorStore(CPU_INTEL_VECTOR_STORE);
       case 'amd':
-        return this.getVectorStore(CPU_AMD_VECTOR_STORE, shopId);
+        return this.getVectorStore(CPU_AMD_VECTOR_STORE);
       default:
         throw new UnknownException({
           message: `Unknown CPU vendor: ${vendor}`,
@@ -43,17 +36,13 @@ export class CpuVectorStoreService {
     }
   }
 
-  async getVectorStore(
-    indexName: string,
-    shopId: string,
-  ): Promise<PineconeStore> {
+  async getVectorStore(indexName: string): Promise<PineconeStore> {
     try {
       const pineconeIndex =
         await this.vectorStoreSourceService.getOrCreateIndex(indexName);
 
       return new PineconeStore(this.embeddings, {
         pineconeIndex,
-        // filter: { shopId: { $eq: shopId } },
       });
     } catch (e) {
       throw new UnknownException({

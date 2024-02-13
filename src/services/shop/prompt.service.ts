@@ -7,7 +7,6 @@ import {
   ISystemPrompt,
   INormalizePromptTemplate,
 } from '../../interfaces/ai/prompt.interface';
-import { PricingTableService } from './pricingTable.service';
 import { UnknownException } from '../../exceptions/unknown.exception';
 import {
   IHardware,
@@ -18,25 +17,22 @@ import { IDisk } from '../../interfaces/computer/disk.interface';
 import { IGpu } from '../../interfaces/computer/gpu.interface';
 import { IMotherboard } from '../../interfaces/computer/motherboard.interface';
 import { IRam } from '../../interfaces/computer/ram.interface';
+import { checkCpuVendorByModelName } from '../../utils/brand/cpu/commonCpu.util';
+import { getIntelBrand } from '../../utils/brand/cpu/intelCpu.util';
+import { getAmdBrand } from '../../utils/brand/cpu/amdCpu.util';
+import { AI_PROMPT_SYSTEM_TEMPLATE } from '../../constants/prompts/commonPrompt.constants';
 import {
   AI_PROMPT_CELERON_SERIES_NORMALIZE_TEMPLATE,
   AI_PROMPT_INTEL_CORE_SERIES_NORMALIZE_TEMPLATE,
   AI_PROMPT_PENTIUM_SERIES_NORMALIZE_TEMPLATE,
   AI_PROMPT_RYZEN_SERIES_NORMALIZE_TEMPLATE,
-  AI_PROMPT_SYSTEM_TEMPLATE,
-} from '../../constants/prompt.constants';
-import { checkCpuVendorByModelName } from '../../utils/brand/cpu/commonCpu.util';
-import { getIntelBrand } from '../../utils/brand/cpu/intelCpu.util';
-import { getAmdBrand } from '../../utils/brand/cpu/amdCpu.util';
+} from '../../constants/prompts/cpuPrompt.constants';
 
 @Injectable()
 export class PromptService {
   private readonly logger = new Logger(PromptService.name);
 
-  constructor(
-    private readonly pricingTableService: PricingTableService,
-    private readonly redisService: RedisService,
-  ) {}
+  constructor(private readonly redisService: RedisService) {}
 
   buildPrompt(hardware: IHardware): IEstimatePrompt {
     const systemPromptTemplate = this._buildSystemPromptTemplate(hardware.type);
@@ -114,61 +110,12 @@ export class PromptService {
           message: 'Unknown hardware type. buildSystemPrompt',
         });
     }
-    // Todo: fetch from DB
-    // const baseSystemPrompt = AI_SAMPLE_COMPUTER_PROMPT;
-    //
-    // const isCpuPricing =
-    //   typia.validate<IHardwareWithPricing<ICpuDataset>[]>(pricingRows);
-    // if (isCpuPricing.success) {
-    //   const cpuPricingTable = isCpuPricing.data
-    //     .map((row) => {
-    //       return `[ ${row.type} | ${row.hardware.vendor} | ${row.hardware.category} | ${row.hardware.normalizedHwKey} | ${row.price} ]`;
-    //     })
-    //     .join('\n');
-    //
-    //   return this._buildPrompt(baseSystemPrompt, cpuPricingTable);
-    // }
-    //
-    // // Todo: remove
-    // return '';
-
-    // const isGpuPricing = typia.validate<IHardwareWithPricing<IGpuDataset>[]>(pricingRows);
-    // if (isGpuPricing.success) {
-    //   const gpuPricingTable = isGpuPricing.data
-    //     .map((row) => {
-    //       return `[ ${row.type} | ${row.hardware.vendor} | ${row.hardware.category} | ${row.hardware.normalizedHwKey} | ${row.price} ]`;
-    //     })
-    //     .join('\n');
-    //
-    //   return this._buildPrompt(baseSystemPrompt, gpuPricingTable);
-    // }
-  }
-
-  private _buildPrompt(
-    baseSystemPrompt: string,
-    cpuPricingTable: string,
-  ): ISystemPrompt {
-    const systemPrompt = baseSystemPrompt
-      .concat('\n\n')
-      .concat(`Here's the pricing table.\n`)
-      .concat('=========================\n')
-      .concat(cpuPricingTable)
-      .concat('\n')
-      .concat('=========================\n');
-    return systemPrompt;
   }
 
   private _buildHardwareQueryInput(hardware: IHardware): string {
     switch (hardware.type) {
       case 'CPU':
         return hardware.hwKey;
-      // const cpu = hardware as ICpu;
-      // return `${cpu.vendorName} | ${cpu.displayName}`;
-      // return `${cpu.displayName}`
-      //   .concat(cpu?.coreCount ? ` / ${cpu.coreCount} cores` : '')
-      //   .concat(cpu?.threadCount ? ` / ${cpu.threadCount} threads` : '')
-      //   .concat(cpu?.baseClock ? ` / ${cpu.baseClock} GHz` : '')
-      //   .concat(cpu?.boostClock ? `@ ${cpu.boostClock} GHz` : '');
 
       case 'GPU':
         const gpu = hardware as IGpu;

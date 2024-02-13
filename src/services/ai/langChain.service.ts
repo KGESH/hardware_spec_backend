@@ -9,11 +9,11 @@ import {
   RunnableSequence,
 } from '@langchain/core/runnables';
 import { IEstimatePrompt } from '../../interfaces/ai/prompt.interface';
-import { AI_PROMPT_INPUT_TEMPLATE } from '../../constants/prompt.constants';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { VectorStore } from '@langchain/core/vectorstores';
 import { formatDocumentsAsString } from 'langchain/util/document';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import { AI_PROMPT_INPUT_TEMPLATE } from '../../constants/prompts/commonPrompt.constants';
 
 @Injectable()
 export class LangChainService {
@@ -27,10 +27,12 @@ export class LangChainService {
   async chatToAI<T>({
     estimatePrompt,
     responseSchema,
+    shopId,
     vectorStore,
   }: {
     estimatePrompt: IEstimatePrompt;
     responseSchema: z.ZodSchema<T>;
+    shopId: string;
     vectorStore: VectorStore;
   }): Promise<z.infer<typeof responseSchema>> {
     const parser = StructuredOutputParser.fromZodSchema(responseSchema);
@@ -50,7 +52,10 @@ export class LangChainService {
       {
         input: new RunnablePassthrough(),
         context: vectorStore
-          .asRetriever({ k: 10, searchType: 'similarity' })
+          .asRetriever({
+            searchType: 'similarity',
+            filter: { shopId: { $eq: shopId } }, // Pinecone metadata filtering
+          })
           .pipe(formatDocumentsAsString),
       },
       prompt,
