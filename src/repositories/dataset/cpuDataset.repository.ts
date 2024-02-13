@@ -5,7 +5,7 @@ import {
   ICpuDataset,
   ICpuDatasetCreate,
   ICpuDatasetQuery,
-} from '../../interfaces/dataset/cpuDataset.interfaces';
+} from '../../interfaces/dataset/cpuDataset.interface';
 import { PrismaService } from '../../services/infra/prisma.service';
 import { UnknownException } from '../../exceptions/unknown.exception';
 import * as uuid from 'uuid';

@@ -46,6 +46,18 @@ enum HardwareType {
 }
 
 /// @namespace EstimateSystem
+enum CpuVendor {
+  intel @map("intel")
+  amd   @map("amd")
+}
+
+enum GpuVendor {
+  nvidia @map("nvidia")
+  amd    @map("amd")
+  intel  @map("intel")
+}
+
+/// @namespace EstimateSystem
 enum EstimateStatus {
   draft     @map("DRAFT") /// estimate create by user.
   estimated @map("ESTIMATED") /// AI estimate done.
@@ -138,8 +150,10 @@ model shop {
   motherboard_estimate      motherboard_estimate[]
   ram_estimate              ram_estimate[]
   disk_estimate             disk_estimate[]
-  cpu_pricing_table         cpu_pricing_table[]
-  gpu_pricing_table         gpu_pricing_table[]
+  // cpu_pricing_table         cpu_pricing_table[] // Todo: remove
+  // gpu_pricing_table         gpu_pricing_table[]
+  cpu_pricing               cpu_pricing[]
+  gpu_pricing               gpu_pricing[]
   motherboard_pricing_table motherboard_pricing_table[]
   ram_pricing_table         ram_pricing_table[]
   disk_pricing_table        disk_pricing_table[]
@@ -171,19 +185,21 @@ model ai_answer {
 /// @namespace EstimateSystem
 /// @namespace CPU
 model cpu {
-  id           String         @id @db.Uuid
-  hw_key       String         @unique
-  model_name   String
-  vendor       String
-  core_count   Int
-  thread_count Int?
-  base_clock   Float?
-  boost_clock  Float?
-  metadata     String?
-  created_at   DateTime       @default(now()) @db.Timestamptz
-  updated_at   DateTime       @updatedAt @db.Timestamptz
-  deleted_at   DateTime?      @db.Timestamptz
-  cpu_estimate cpu_estimate[]
+  id                String         @id @db.Uuid
+  hw_key            String         @unique /// fetch from OS. unique per hardware
+  normalized_hw_key String         @unique /// normalized hw_key
+  model_name        String
+  vendor            CpuVendor
+  core_count        Int
+  thread_count      Int?
+  base_clock        Float?
+  boost_clock       Float?
+  metadata          String?
+  created_at        DateTime       @default(now()) @db.Timestamptz
+  updated_at        DateTime       @updatedAt @db.Timestamptz
+  deleted_at        DateTime?      @db.Timestamptz
+  // cpu_dataset       cpu_dataset    @relation(fields: [normalized_hw_key], references: [normalized_model_name], onUpdate: Cascade)
+  cpu_estimate      cpu_estimate[]
 
   @@index([vendor])
   @@index([model_name])
@@ -192,17 +208,19 @@ model cpu {
 /// @namespace EstimateSystem
 /// @namespace GPU
 model gpu {
-  id           String         @id @db.Uuid
-  hw_key       String         @unique
-  model_name   String
-  chipset      String
-  vendor       String
-  sub_vendor   String?
-  metadata     String?
-  created_at   DateTime       @default(now()) @db.Timestamptz
-  updated_at   DateTime       @updatedAt @db.Timestamptz
-  deleted_at   DateTime?      @db.Timestamptz
-  gpu_estimate gpu_estimate[]
+  id                String         @id @db.Uuid
+  hw_key            String         @unique
+  normalized_hw_key String         @unique /// normalized hw_key
+  model_name        String
+  chipset           String
+  vendor            String
+  sub_vendor        String?
+  metadata          String?
+  created_at        DateTime       @default(now()) @db.Timestamptz
+  updated_at        DateTime       @updatedAt @db.Timestamptz
+  deleted_at        DateTime?      @db.Timestamptz
+  // gpu_dataset       gpu_dataset    @relation(fields: [normalized_hw_key], references: [normalized_model_name], onUpdate: Cascade)
+  gpu_estimate      gpu_estimate[]
 
   @@index([vendor])
   @@index([model_name])
@@ -358,29 +376,81 @@ model disk_estimate {
   @@index([created_at])
 }
 
-/// @namespace EstimateSystem
-/// @namespace CPU
-model cpu_pricing_table {
-  id         String    @id @db.Uuid
-  shop_id    String    @db.Uuid
-  sheets     String
-  created_at DateTime  @default(now()) @db.Timestamptz
-  updated_at DateTime  @updatedAt @db.Timestamptz
-  deleted_at DateTime? @db.Timestamptz
-  shop       shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
+model cpu_dataset {
+  id                    String        @id @db.Uuid
+  normalized_model_name String        @unique /// normalized model_name, e.g. "i9 10900k"
+  category              String
+  vendor                CpuVendor?
+  metadata              String?
+  created_at            DateTime      @default(now()) @db.Timestamptz
+  updated_at            DateTime      @updatedAt @db.Timestamptz
+  deleted_at            DateTime?     @db.Timestamptz
+  cpu_pricing           cpu_pricing[]
+  // cpu                   cpu?
+}
+
+model gpu_dataset {
+  id                    String        @id @db.Uuid
+  normalized_model_name String        @unique
+  category              String
+  vendor                GpuVendor?
+  metadata              String?
+  created_at            DateTime      @default(now()) @db.Timestamptz
+  updated_at            DateTime      @updatedAt @db.Timestamptz
+  deleted_at            DateTime?     @db.Timestamptz
+  gpu_pricing           gpu_pricing[]
+  // gpu                   gpu?
 }
 
 /// @namespace EstimateSystem
-/// @namespace GPU
-model gpu_pricing_table {
-  id         String    @id @db.Uuid
-  shop_id    String    @db.Uuid
-  sheets     String
-  created_at DateTime  @default(now()) @db.Timestamptz
-  updated_at DateTime  @updatedAt @db.Timestamptz
-  deleted_at DateTime? @db.Timestamptz
-  shop       shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
+/// @namespace CPU
+model gpu_pricing {
+  id             String      @id @db.Uuid
+  shop_id        String      @db.Uuid
+  gpu_dataset_id String      @db.Uuid
+  price          Float
+  created_at     DateTime    @default(now()) @db.Timestamptz
+  updated_at     DateTime    @updatedAt @db.Timestamptz
+  deleted_at     DateTime?   @db.Timestamptz
+  shop           shop        @relation(fields: [shop_id], references: [id], onDelete: Cascade)
+  gpu_dataset    gpu_dataset @relation(fields: [gpu_dataset_id], references: [id], onDelete: Cascade)
 }
+
+/// @namespace EstimateSystem
+/// @namespace CPU
+model cpu_pricing {
+  id             String      @id @db.Uuid
+  shop_id        String      @db.Uuid
+  cpu_dataset_id String      @db.Uuid
+  price          Float
+  created_at     DateTime    @default(now()) @db.Timestamptz
+  updated_at     DateTime    @updatedAt @db.Timestamptz
+  deleted_at     DateTime?   @db.Timestamptz
+  shop           shop        @relation(fields: [shop_id], references: [id], onDelete: Cascade)
+  cpu_dataset    cpu_dataset @relation(fields: [cpu_dataset_id], references: [id], onDelete: Cascade)
+}
+
+// model cpu_pricing_table {
+//   id         String    @id @db.Uuid
+//   shop_id    String    @db.Uuid
+//   sheets     String
+//   created_at DateTime  @default(now()) @db.Timestamptz
+//   updated_at DateTime  @updatedAt @db.Timestamptz
+//   deleted_at DateTime? @db.Timestamptz
+//   shop       shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
+// }
+
+// /// @namespace EstimateSystem
+// /// @namespace GPU
+// model gpu_pricing_table {
+//   id         String    @id @db.Uuid
+//   shop_id    String    @db.Uuid
+//   sheets     String
+//   created_at DateTime  @default(now()) @db.Timestamptz
+//   updated_at DateTime  @updatedAt @db.Timestamptz
+//   deleted_at DateTime? @db.Timestamptz
+//   shop       shop      @relation(fields: [shop_id], references: [id], onDelete: Cascade)
+// }
 
 /// @namespace EstimateSystem
 /// @namespace MotherBoard

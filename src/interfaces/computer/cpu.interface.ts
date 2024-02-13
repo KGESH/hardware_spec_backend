@@ -5,6 +5,7 @@ export type ICpuVendor = 'intel' | 'amd';
 
 export type ICpu = IHardware & {
   type: 'CPU';
+  vendorName: ICpuVendor;
   coreCount: number;
   threadCount: number | null;
   baseClock: number | null;

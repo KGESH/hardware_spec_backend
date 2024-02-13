@@ -13,13 +13,17 @@ import { MockShopHelper } from '../../helpers/random/shop.helper';
 import { RedisService } from '../../../src/services/infra/redis.service';
 import { UnknownException } from '../../../src/exceptions/unknown.exception';
 import { PrismaService } from '../../../src/services/infra/prisma.service';
+import { ShopRepository } from '../../../src/repositories/shop/shop.repository';
+import { ConfigsService } from '../../../src/configs/configs.service';
 
 describe('[EventSubscribeController]', () => {
   let estimateService: EstimateService;
   let shopService: ShopService;
+  let mockShopRepository: DeepMockProxy<ShopRepository>;
   let controller: EventSubscribeController;
   let mockRedisService: DeepMockProxy<RedisService>;
   let prismaService: PrismaService;
+  let configsService: ConfigsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,6 +31,8 @@ describe('[EventSubscribeController]', () => {
     })
       .overrideProvider(RedisService)
       .useValue(mockDeep<RedisService>())
+      .overrideProvider(ShopRepository)
+      .useValue(mockDeep<ShopRepository>())
       .setLogger(new Logger())
       .compile();
 
@@ -35,15 +41,40 @@ describe('[EventSubscribeController]', () => {
     mockRedisService = module.get(RedisService);
     controller = module.get(EventSubscribeController);
     prismaService = module.get(PrismaService);
+    mockShopRepository = module.get(ShopRepository);
+    configsService = module.get(ConfigsService);
   });
 
   beforeEach(() => {
     // Ignore REDIS cache
     mockRedisService.getDeserialize.mockResolvedValue(null);
+    // Test vector db
+    const TEST_SHOP_ID = configsService.env.DEBUG_SHOP_ID;
+    mockShopRepository.findBy.mockImplementation(async (query) => {
+      const mockShop = await prismaService.shop.findUnique({
+        where: {
+          id: query.id,
+        },
+      });
+      if (!mockShop) return null;
+      return MockShopHelper.transform(mockShop);
+    });
+    mockShopRepository.create.mockImplementation(async (dto) => {
+      const mockShop = await prismaService.shop.create({
+        data: {
+          id: TEST_SHOP_ID,
+          name: dto.name,
+          country: dto.country,
+        },
+      });
+      return MockShopHelper.transform(mockShop);
+    });
   });
 
   afterEach(() => {
     mockRedisService.getDeserialize.mockReset();
+    mockShopRepository.findBy.mockReset();
+    mockShopRepository.create.mockReset();
   });
 
   afterEach(async () => {

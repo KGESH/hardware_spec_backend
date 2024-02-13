@@ -1,7 +1,9 @@
 import { Controller, Get, Logger } from '@nestjs/common';
 import { CpuDatasetService } from '../services/dataset/cpuDataset.service';
-import { TypedParam } from '@nestia/core';
+import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
 import { GpuDatasetService } from '../services/dataset/gpuDataset.service';
+import { CpuDatasetEmbeddingsDto } from '../dtos/dataset/cpuDataset.dto';
+import { ResponseDto } from '../dtos/response/response.dto';
 
 @Controller('dataset')
 export class DatasetController {
@@ -15,10 +17,21 @@ export class DatasetController {
   // Todo: replace to post
   @Get('/cpu/:shopId')
   async getCpuDataset(@TypedParam('shopId') shopId: string) {
+    // Todo: impl
     return await Promise.all([
       this.cpuDatasetService.createIntelCpuTable({ shopId }),
       this.cpuDatasetService.createAmdCpuTable({ shopId }),
     ]);
+  }
+  @TypedRoute.Post('/cpu')
+  async createCpuEmbeddings(
+    @TypedBody() dto: CpuDatasetEmbeddingsDto,
+  ): Promise<ResponseDto<string>> {
+    await this.cpuDatasetService.embeddingsCpuFromWeb(dto);
+    return {
+      status: 'success',
+      data: 'done',
+    };
   }
 
   @Get('/gpu/:shopId')

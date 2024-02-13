@@ -6,18 +6,18 @@ import { VectorStoreService } from '../../../src/services/ai/vectorStore.service
 import { ICpu } from '../../../src/interfaces/computer/cpu.interface';
 import { MockCpuHelper } from '../../helpers/random/cpu.helper';
 import { IEstimatePrompt } from '../../../src/interfaces/ai/prompt.interface';
-import {
-  AI_PROMPT_INTEL_CORE_SERIES_NORMALIZE_TEMPLATE,
-  AI_PROMPT_SYSTEM_TEMPLATE,
-} from '../../../src/constants/prompt.constants';
 import { IAIResponse } from '../../../src/interfaces/ai/aiAnswer.interface';
 import { aiAnswerSchema } from '../../../src/schemas/langchain.schema';
 import { PrismaService } from '../../../src/services/infra/prisma.service';
+import { AI_PROMPT_SYSTEM_TEMPLATE } from '../../../src/constants/prompts/commonPrompt.constants';
+import { AI_PROMPT_INTEL_CORE_SERIES_NORMALIZE_TEMPLATE } from '../../../src/constants/prompts/cpuPrompt.constants';
+import { ConfigsService } from '../../../src/configs/configs.service';
 
-describe('[AI CPU Intel Service]', () => {
+describe('[Integration] AI CPU Intel Service', () => {
   let langChainService: LangChainService;
   let vectorStoreService: VectorStoreService;
   let prismaService: PrismaService;
+  let configsService: ConfigsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,6 +27,7 @@ describe('[AI CPU Intel Service]', () => {
     langChainService = module.get(LangChainService);
     vectorStoreService = module.get(VectorStoreService);
     prismaService = module.get(PrismaService);
+    configsService = module.get(ConfigsService);
   });
 
   afterEach(async () => {
@@ -42,6 +43,7 @@ describe('[AI CPU Intel Service]', () => {
 
   describe('[Intel CPU]', () => {
     it('should be find Intel CPU price from AI', async () => {
+      const TEST_SHOP_ID = configsService.env.DEBUG_SHOP_ID;
       const cpu: ICpu = {
         ...MockCpuHelper.dto(),
         vendorName: 'intel',
@@ -52,11 +54,12 @@ describe('[AI CPU Intel Service]', () => {
         normalizePromptTemplate: AI_PROMPT_INTEL_CORE_SERIES_NORMALIZE_TEMPLATE,
         input: cpu.hwKey,
       };
-      const intelVectorStore = vectorStoreService.getVectorStore(cpu);
+      const intelVectorStore = await vectorStoreService.getVectorStore(cpu);
 
       // Normalize & Retrieve vector store
       const answer = await langChainService.chatToAI<IAIResponse>({
         estimatePrompt,
+        shopId: TEST_SHOP_ID,
         vectorStore: intelVectorStore,
         responseSchema: aiAnswerSchema,
       });

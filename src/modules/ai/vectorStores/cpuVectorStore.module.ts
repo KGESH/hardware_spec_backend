@@ -1,17 +1,20 @@
 import { Module } from '@nestjs/common';
-import { cpuVectorStoreProviders } from './cpuVectorStore.factory';
 import { CpuVectorStoreService } from '../../../services/ai/vectorStore/cpuVectorStore.service';
 import { aiEmbeddingsModelProviders } from '../models/aiEmbeddingsModel.factory';
+import { vectorStoreSourceFactory } from './vectorStoreSource.factory';
+import { VectorStoreSourceService } from '../../../services/ai/vectorStore/vectorStoreSource.service';
 
 @Module({
   providers: [
     ...aiEmbeddingsModelProviders,
-    ...cpuVectorStoreProviders,
+    vectorStoreSourceFactory,
+    VectorStoreSourceService,
     CpuVectorStoreService,
   ],
   exports: [
-    ...cpuVectorStoreProviders,
     ...aiEmbeddingsModelProviders,
+    vectorStoreSourceFactory,
+    VectorStoreSourceService,
     CpuVectorStoreService,
   ],
 })

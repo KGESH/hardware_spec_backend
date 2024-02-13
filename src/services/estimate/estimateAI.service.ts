@@ -86,15 +86,13 @@ export class EstimateAIService {
     currency,
     estimateId,
   }: Omit<IPartEstimateCreate, 'aiResponse'>): Promise<IPartEstimate> {
-    const estimatePrompt = this.promptService.buildPrompt(
-      // shopId,
-      hardware,
-    );
-    const vectorStore = this.vectorStoreService.getVectorStore(hardware);
+    const estimatePrompt = this.promptService.buildPrompt(hardware);
+    const vectorStore = await this.vectorStoreService.getVectorStore(hardware);
 
     return this.langChainService
       .chatToAI<IAIResponse>({
         estimatePrompt,
+        shopId,
         vectorStore,
         responseSchema: aiAnswerSchema,
       })

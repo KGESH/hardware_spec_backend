@@ -11,10 +11,16 @@ export class VectorStoreService {
 
   constructor(private readonly cpuVectorStoreService: CpuVectorStoreService) {}
 
-  getVectorStore(hardware: IHardware): VectorStore {
+  getVectorStore(
+    hardware: Pick<IHardware, 'type' | 'vendorName'>,
+    shopId: string = '3ec748a4-ef57-4ba6-8f47-e70509462ff3',
+  ): Promise<VectorStore> {
     switch (hardware.type) {
       case 'CPU':
-        return this.cpuVectorStoreService.getCpuVectorStore(hardware as ICpu);
+        return this.cpuVectorStoreService.getCpuVectorStore(
+          hardware as ICpu,
+          shopId,
+        );
       default:
         throw new UnknownException({
           message: `TODO: IMPL ${hardware.type}`,

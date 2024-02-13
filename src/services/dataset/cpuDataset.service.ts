@@ -2,8 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   ICpuDataset,
   ICpuDatasetCreate,
+  ICpuDatasetEmbeddings,
   ICpuDatasetQuery,
-} from '../../interfaces/dataset/cpuDataset.interfaces';
+} from '../../interfaces/dataset/cpuDataset.interface';
 import { CpuDatasetRepository } from '../../repositories/dataset/cpuDataset.repository';
 import { CpuPricingRepository } from '../../repositories/shop/cpuPricing.repository';
 import { IDatasetPricingCreate } from '../../interfaces/shop/pricingTable.interface';
@@ -11,17 +12,46 @@ import { KoreaCrawlingService } from '../crawling/koreaCrawling.service';
 import * as cheerio from 'cheerio';
 import { normalizeAmdCpu } from '../../utils/brand/cpu/amdCpu.util';
 import { normalizeIntelCpu } from '../../utils/brand/cpu/intelCpu.util';
-import { ICpuPricingCreate } from '../../interfaces/shop/cpuPricing.interfaces';
+import { ICpuPricingCreate } from '../../interfaces/shop/cpuPricing.interface';
+import { LearnService } from '../ai/learn.service';
+import { Document } from 'langchain/document';
+import { VectorStoreService } from '../ai/vectorStore.service';
 
 @Injectable()
 export class CpuDatasetService {
   private readonly logger = new Logger(CpuDatasetService.name);
 
   constructor(
+    private readonly vectorStoreService: VectorStoreService,
+    private readonly learnService: LearnService,
     private readonly koCrawlingService: KoreaCrawlingService,
     private readonly cpuDatasetRepository: CpuDatasetRepository,
     private readonly cpuDatasetPricingTableRepository: CpuPricingRepository,
   ) {}
+
+  async embeddingsCpuFromWeb(dto: ICpuDatasetEmbeddings): Promise<void> {
+    const docs = await this.learnService.fetchDocsFromWeb(dto);
+    const vectorStore = await this.vectorStoreService.getVectorStore({
+      type: 'CPU',
+      vendorName: dto.vendor,
+    });
+
+    // For Google embeddings rate limit
+    const batches: Document[][] = [];
+    for (let i = 0; i < docs.length; i += 100) {
+      batches.push(docs.slice(i, Math.min(i + 100, docs.length)));
+    }
+
+    for (const batch of batches) {
+      try {
+        this.logger.debug(`Adding document to vector store...`);
+        await vectorStore.addDocuments(batch);
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // delay 1 sec
+      } catch (e) {
+        this.logger.error(`Failed to add documents to vector store.`, e);
+      }
+    }
+  }
 
   async createAmdCpuTable(dto: Pick<IDatasetPricingCreate, 'shopId'>) {
     const amdCpuUrlQueries = [

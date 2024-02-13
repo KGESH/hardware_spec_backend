@@ -2,6 +2,8 @@ export const AI_MODEL = 'AI_MODEL';
 
 export const AI_EMBEDDINGS_MODEL = 'AI_EMBEDDINGS_MODEL';
 
+export const AI_VECTOR_STORE_SOURCE_CLIENT = 'AI_VECTOR_STORE_SOURCE_CLIENT';
+
 export const CPU_INTEL_VECTOR_STORE = 'cpu-intel-vector-store';
 
 export const CPU_AMD_VECTOR_STORE = 'cpu-amd-vector-store';
